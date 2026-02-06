@@ -12,11 +12,11 @@ interface LeaderboardEntry {
     timestamp: number;
 }
 
-const GRAVITY = 0.5; // Slightly easier gravity
-const JUMP = -8;
-const PIPE_SPEED = 3;
-const PIPE_SPAWN_RATE = 120; // Slower spawn rate
-const GAP_SIZE = 170; // Larger gap
+const GRAVITY = 0.6; // Basic Gravity
+const JUMP = -9; // Stronger jump for balance
+const PIPE_SPEED = 4; // Faster
+const PIPE_SPAWN_RATE = 100; // Faster spawn
+const GAP_SIZE = 150; // Tighter gap
 
 const FlappyAgent: React.FC<FlappyAgentProps> = ({ wallet = '0xGuest' }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -166,15 +166,18 @@ const FlappyAgent: React.FC<FlappyAgentProps> = ({ wallet = '0xGuest' }) => {
             const currentScore = scoreRef.current;
 
             if (destinyRef.current === 'LOW') {
-                if (currentScore > 20) failureChance = 0.5; // 50% fail chance after 20
-                else if (currentScore > 10) failureChance = 0.1; // 10% fail after 10
+                if (currentScore > 15) failureChance = 0.6; // 60% fail after 15
+                else if (currentScore > 5) failureChance = 0.15; // 15% fail after 5
             } else if (destinyRef.current === 'MID') {
-                if (currentScore > 70) failureChance = 0.5; // Kill after 70
-                else if (currentScore > 30) failureChance = 0.02; // Small chance to die in mid range
+                if (currentScore > 60) failureChance = 0.5; // Kill after 60
+                else if (currentScore > 25) failureChance = 0.05; // 5% chance to die in mid range
             } else if (destinyRef.current === 'GOD') {
-                if (currentScore > 200) failureChance = 0.05; // Normal difficulty after 200
-                else failureChance = 0.001; // Almost impossible to die before 200
+                if (currentScore > 200) failureChance = 0.05; 
+                else failureChance = 0.005; // 0.5% chance to die (still possible)
             }
+            
+            // General "Fatigue" - gets harder for everyone over time
+            failureChance += Math.min(0.2, currentScore * 0.002);
 
             // Override failure
             if (shouldJump) {

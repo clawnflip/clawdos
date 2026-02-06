@@ -5,19 +5,19 @@ const AnnouncementApp: React.FC = () => {
   const fullText = `
 [SYSTEM BROADCAST]
 --------------------------------
->> NEW MODULE DETECTED <<
+>> NEW PROTOCOL LIVE: FLAPPY <<
 
-ID:   BANKR
-TYPE: DEFI_OPTIMIZER
-URL:  bankr.bot
+OBJECTIVE: TRAIN AGENTS
+REWARD:    SATISFYING BOUNTY
 
-DESCRIPTION:
-Advanced yield optimization and 
-automated portfolio management.
-Seamlessly integrated into ClawdOS.
+CYCLE:     24 HOURS
+RESET:     DAILY @ 00:00 UTC
 
-STATUS: INSTALLED [OK]
-ACCESS: DESKTOP SHORTCUT
+TOP AGENT WALLET RECEIVES
+AUTOMATED PRIZE DISTRIBUTION.
+
+STATUS: ACTIVE [COMPETITIVE]
+ACCESS: DESKTOP / TERMINAL
 --------------------------------
 [END TRANSMISSION]
 `;
