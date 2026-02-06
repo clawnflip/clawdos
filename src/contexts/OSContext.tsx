@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import ethSpeedrunLogo from '../assets/favicon.fd4d7e2c-1.png';
+
 
 export interface WindowState {
   id: string;
@@ -170,7 +170,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       type: 'link', 
       parentId: 'desktop', 
       url: 'https://speedrunethereum.com/',
-      icon: ethSpeedrunLogo 
+      icon: '/speedrun-eth.png' 
     },
   ]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
