@@ -27,7 +27,6 @@ const Logo: React.FC<LogoProps> = ({ className = "w-10 h-10", showText = true })
                 stroke="url(#lobsterGradient)" 
                 strokeWidth="8" 
                 strokeLinecap="round"
-                className="animate-pulse"
             />
             <path 
                 d="M50 35 C 30 35, 15 50, 15 75" 
@@ -35,9 +34,7 @@ const Logo: React.FC<LogoProps> = ({ className = "w-10 h-10", showText = true })
                 stroke="url(#lobsterGradient)" 
                 strokeWidth="8" 
                 strokeLinecap="round"
-                className="opacity-80"
             />
-             <circle cx="50" cy="55" r="5" fill="#fff" className="animate-ping opacity-50" />
         </svg>
       </div>
       

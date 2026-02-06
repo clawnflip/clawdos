@@ -72,7 +72,7 @@ const Desktop: React.FC = () => {
         {/* Debug Indicator - Will remove later */}
         {/* <div className="absolute top-0 right-0 p-2 text-xs text-green-500 z-50">Desktop Mounted</div> */}
         {/* Background Logo */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-100">
            <Logo className="w-1/3 h-1/3" showText={true} />
         </div>
         

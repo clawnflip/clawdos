@@ -59,6 +59,19 @@ const Icon: React.FC<IconProps> = ({ item }) => {
         return;
     }
 
+    if (item.name === 'Data Terminal') {
+        import('../apps/MarketTerminal').then(module => {
+            const MarketTerminal = module.default;
+            openWindow(
+                'Open Trident Data',
+                <MarketTerminal />,
+                <span>📊</span>,
+                { width: 800, height: 600 }
+            );
+        });
+        return;
+    }
+
     if (item.type === 'link' && item.url) {
         openWindow(
             item.name, 

@@ -139,6 +139,21 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       url: 'https://www.opentrident.xyz/',
       icon: 'https://pbs.twimg.com/profile_images/2018321879409307648/gqYF-un7_400x400.jpg'
     },
+    { 
+      id: 'data_terminal', 
+      name: 'Data Terminal', 
+      type: 'link', 
+      parentId: 'desktop', 
+      icon: '📊'
+    },
+    { 
+      id: 'clawdict', 
+      name: 'Clawdict', 
+      type: 'link', 
+      parentId: 'desktop', 
+      url: 'https://www.clawdict.com/',
+      icon: 'https://pbs.twimg.com/profile_images/2017657129927139328/7FXsrH3v_400x400.jpg'
+    },
   ]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
 
@@ -258,6 +273,19 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
             })
             .catch(err => {
                 console.error("OSContext: Failed to load AgentChat", err);
+            });
+
+        // Auto-open Announcement Terminal (Left Dock)
+        import('../components/apps/AnnouncementApp')
+            .then(module => {
+                 const AnnouncementApp = module.default;
+                 openWindow(
+                     'System Broadcast',
+                     <AnnouncementApp />,
+                     <span>📢</span>,
+                     { width: 350, height: 400 },
+                     { x: 20, y: 50 }
+                 );
             });
     }
   }, []);

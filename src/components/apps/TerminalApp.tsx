@@ -6,7 +6,16 @@ const TerminalApp: React.FC = () => {
   const { agent, setAgent, terminalCommand, setTerminalCommand, openWindow } = useOS();
   
   const [history, setHistory] = useState<Array<{ type: 'input' | 'output', content: string }>>([
-    { type: 'output', content: `Welcome to ClawdOS Terminal v1.0\nType 'help' to see available commands.\n--------------------------------\nCurrent User: ${agent.name || 'GUEST'}` }
+    { type: 'output', content: `
+Welcome to ClawdOS Terminal v1.0
+--------------------------------
+[SYSTEM UPDATE]
+>> OPEN TRIDENT PROTOCOL INTEGRATED <<
+Status: ACTIVE
+Access: Desktop Icon or 'deploy_core_kernel'
+--------------------------------
+Type 'help' to see available commands.
+Current User: ${agent.name || 'GUEST'}` }
   ]);
   const [inputObj, setInputObj] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
