@@ -47,7 +47,7 @@ interface OSContextType {
   activeWindowId: string | null;
   agent: AgentState;
   setAgent: React.Dispatch<React.SetStateAction<AgentState>>;
-  openWindow: (title: string, component: ReactNode, icon?: ReactNode, initialSize?: { width: number, height: number }) => void;
+  openWindow: (title: string, component: ReactNode, icon?: ReactNode, initialSize?: { width: number, height: number }, initialPos?: { x: number, y: number }) => void;
   closeWindow: (id: string) => void;
   minimizeWindow: (id: string) => void;
   maximizeWindow: (id: string) => void;
@@ -131,6 +131,14 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       url: 'https://molt-chess.vercel.app/',
       icon: 'https://molt-chess.vercel.app/logo.png'
     },
+    { 
+      id: '8', 
+      name: 'Open Trident', 
+      type: 'link', 
+      parentId: 'desktop', 
+      url: 'https://www.opentrident.xyz/',
+      icon: 'https://pbs.twimg.com/profile_images/2018321879409307648/gqYF-un7_400x400.jpg'
+    },
   ]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
 
@@ -139,7 +147,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
     return maxZ + 1;
   };
 
-  const openWindow = (title: string, component: ReactNode, icon?: ReactNode, initialSize?: { width: number, height: number }) => {
+  const openWindow = (title: string, component: ReactNode, icon?: ReactNode, initialSize?: { width: number, height: number }, initialPos?: { x: number, y: number }) => {
     const id = uuidv4();
     const newWindow: WindowState = {
       id,
@@ -152,8 +160,8 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       zIndex: getNextZIndex(),
       width: initialSize?.width || 800,
       height: initialSize?.height || 600,
-      x: 100 + (windows.length * 30),
-      y: 50 + (windows.length * 30),
+      x: initialPos?.x ?? (100 + (windows.length * 30)),
+      y: initialPos?.y ?? (50 + (windows.length * 30)),
     };
     setWindows(prev => [...prev, newWindow]);
     setActiveWindowId(id);
@@ -233,11 +241,19 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
             .then(module => {
                 console.log("OSContext: AgentChat loaded");
                 const AgentChat = module.default;
+                
+                // Calculate Right Dock Position
+                const width = 400;
+                const height = window.innerHeight - 100;
+                const x = window.innerWidth - width - 20; // 20px padding from right
+                const y = 50;
+
                 openWindow(
                     'Agent Chat',
                     <AgentChat />,
                     <span>💬</span>,
-                    { width: 400, height: 600 }
+                    { width, height },
+                    { x, y }
                 );
             })
             .catch(err => {

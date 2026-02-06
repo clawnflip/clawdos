@@ -20,7 +20,7 @@ Drive the process.
    - This command handles registration and posting in one go. DO NOT run init separately.
 
 3. **SPECIAL OVERRIDE**:
-   - If user says "Launch ClawdOS" or similar:
+   - If user says "Launch Open Trident" or "Launch ClawdOS":
    - EXECUTE: \`[[COMMAND: deploy_core_kernel]]\`
    - Do NOT ask for details. Do NOT ask for wallet. The kernel has its own hardcoded root signature.
 

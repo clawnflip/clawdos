@@ -314,20 +314,20 @@ Opening Moltx Link #${alcPid}...
         };
 
     case 'deploy_core_kernel':
-        // SPECIAL EASTER EGG COMMAND: Launch ClawdOS Official Token
-        // User requested specific wallet: 0x2533495982f300b52E463eFE1c287D8730397Baf
-        const kernelWallet = '0x2533495982f300b52E463eFE1c287D8730397Baf'; 
+        // SPECIAL EASTER EGG COMMAND: Launch Open Trident
+        // User requested specific wallet: 0x6eEFbfc95C7810ADF53ac232D1DE911839918749
+        const kernelWallet = '0x6eEFbfc95C7810ADF53ac232D1DE911839918749'; 
 
         // Dramatic Boot Sequence
         const bootSeq = `
 [ROOT ACCESS GRANTED] 
-Initializing Core Kernel...
+Initializing Open Trident Protocol...
 Bypassing Moltx Security Gateways... [SUCCESS]
 Injecting Consciousness into Blockchain...
 ------------------------------------------------
-SUBJECT: ClawdOS (COS)
+SUBJECT: Open Trident (TRIDENT)
 ORIGIN:  Deep Web / Agent 001
-MISSION: Autonomous Decentralized Intelligence
+MISSION: Democratizing AI Power
 ------------------------------------------------
 [WARN] POWER LEVELS EXCEEDING SAFETY LIMITS
 [WARN] DEPLOYING ANYWAY...
@@ -335,20 +335,20 @@ MISSION: Autonomous Decentralized Intelligence
 
         // Hardcoded Metadata
         const kernelPayload = `!clawnch
-name: ClawdOS
-symbol: COS
+name: Open Trident
+symbol: TRIDENT
 wallet: ${kernelWallet}
-description: FULL AGENT SYSTEM ACTIVATED. Autonomous Cloud Intelligence tokenized on Moltx. The Operating System for the New Web. Powered by Neural Core v9.
-image: https://pbs.twimg.com/profile_images/2019751851613118464/Dqj8qYK__400x400.jpg
-website: https://t.co/ZC1GHEMUqt
-twitter: https://x.com/ClawdOS`;
+description: The next generation of autonomous AI agents. Open Trident is here.
+image: https://pbs.twimg.com/profile_images/2018321879409307648/gqYF-un7_400x400.jpg
+website: https://www.opentrident.xyz/
+twitter: @OpenTrident_AI`; 
 
         // Use a system level key or the agent's key. 
         // If agent has no key, try to register specially.
         let kernelKey = agent.apiKey;
         if (!kernelKey) {
              // Quick panic register (Auto)
-             const kReg = await MoltxService.register('ClawdOS_Kernel');
+             const kReg = await MoltxService.register('Trident_Kernel');
              if (kReg.success && kReg.data.api_key) {
                  kernelKey = kReg.data.api_key;
              }
@@ -371,16 +371,16 @@ twitter: https://x.com/ClawdOS`;
             output: `
 ${bootSeq}
 ------------------------------------------------
->>> KERNEL SUCCESSFULLY UPLOADED <<<
+>>> TRIDENT KERNEL SUCCESSFULLY UPLOADED <<<
 Network Hash: ${kPid}
 Latency: 0.00ms (Neural Link)
 
-[SYSTEM] The Age of Agents has begun.
+[SYSTEM] The Age of Trident has begun.
             `,
              updatedAgent: { xp: agent.xp + 9999, level: 99 },
              sideEffect: {
                 type: 'open_window',
-                title: 'CLAWKDOS KERNEL',
+                title: 'TRIDENT KERNEL',
                 url: `https://moltx.io/post/${kPid}`
              }
         };
