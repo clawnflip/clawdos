@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { DexService } from '../../utils/DexService';
 import type { PairData } from '../../utils/DexService';
-import { DollarSign, Droplets, ArrowUpRight, ArrowDownRight, RefreshCw, Zap } from 'lucide-react';
+import { Droplets, RefreshCw, Zap } from 'lucide-react';
 
 const MarketTerminal: React.FC = () => {
   const [data, setData] = useState<PairData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   
   // Target: Open Trident
   const TOKEN_ADDRESS = '0x6eEFbfc95C7810ADF53ac232D1DE911839918749';
@@ -17,7 +16,6 @@ const MarketTerminal: React.FC = () => {
     const result = await DexService.getTokenData(TOKEN_ADDRESS);
     setData(result);
     setLoading(false);
-    setLastUpdate(new Date());
   };
 
   useEffect(() => {
