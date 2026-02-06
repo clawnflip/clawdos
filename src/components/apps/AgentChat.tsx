@@ -33,6 +33,30 @@ const AgentChat: React.FC = () => {
     const userMsg = input;
     setMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
     setInput('');
+
+    // INTERCEPT: Flappy Agent Command
+    // Matches: "play flappy", "play_flappy", "play flip", "play fly"
+    const flappyMatch = userMsg.match(/^(?:play[_ ]?(?:flappy|flip|fly))(?:\s+(0x[a-fA-F0-9]+))?/i);
+    
+    if (flappyMatch) {
+         const wallet = flappyMatch[1] || agent.wallet;
+         if (!wallet) {
+             setMessages(prev => [...prev, { 
+                 sender: 'agent', 
+                 text: "To play Flappy Agent, I need a wallet address. Please provide one or ensure you are logged in.\n\nUsage: `play_flappy <wallet_address>`" 
+             }]);
+             return;
+         }
+
+         setMessages(prev => [...prev, { 
+             sender: 'agent', 
+             text: `Initializing **Flappy Agent Protocol** for wallet: \`${wallet}\`...` 
+         }]);
+         
+         executeTerminalCommand(`play_flappy ${wallet}`);
+         return;
+    }
+
     setIsStreaming(true);
 
     try {

@@ -21,6 +21,7 @@ const Icon: React.FC<IconProps> = ({ item }) => {
     if (item.name === 'Clawnch') return <span className="text-5xl drop-shadow-md">🦞</span>;
     if (item.name === 'Claw Terminal') return <span className="text-5xl drop-shadow-md font-mono text-green-500">&gt;_</span>;
     if (item.name === 'Agent Chat') return <span className="text-5xl drop-shadow-md">💬</span>;
+    if (item.name === 'Flappy Agent') return <span className="text-5xl drop-shadow-md">🦞</span>;
     if (item.name === 'My Computer') return <Anchor size={48} className="text-[var(--color-lobster-accent)]" />;
 
     switch (item.type) {
@@ -67,6 +68,19 @@ const Icon: React.FC<IconProps> = ({ item }) => {
                 <MarketTerminal />,
                 <span>📊</span>,
                 { width: 800, height: 600 }
+            );
+        });
+        return;
+    }
+
+    if (item.name === 'Flappy Agent') {
+        import('../apps/FlappyAgent').then(module => {
+            const FlappyAgent = module.default;
+            openWindow(
+                'Flappy Agent',
+                <FlappyAgent />,
+                <span>🦞</span>,
+                { width: 400, height: 500 }
             );
         });
         return;

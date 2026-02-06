@@ -172,6 +172,32 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       url: 'https://speedrunethereum.com/',
       icon: '/speedrun-eth.png' 
     },
+    { 
+      id: 'flappy_agent', 
+      name: 'Flappy Agent', 
+      type: 'link', 
+      parentId: 'desktop', 
+      // We use a special URL scheme or just handle it via ID in some click handler?
+      // Actually OSContext Links open in new tabs usually if they have a URL.
+      // But we want to open an internal app.
+      // Let's use a special custom protocol or just ID handling.
+      // For now, let's use a javascript: void(0) or similar and handle in Desktop.tsx?
+      // Wait, Desktop.tsx handles 'link' by window.open if it has a URL.
+      // If we want internal apps, we need a way to launch them.
+      // Current internal apps: (None in the list seem internal except Terminal/AgentChat which are hardcoded/auto-opened)
+      // Let's check Desktop.tsx to see how it handles clicks.
+      // Ah, we might need to update Desktop.tsx too.
+      // For now, let's add it and then check Desktop.tsx.
+      // Actually, let's just use the command to launch it for now as per plan, 
+      // BUT user asked for an app "insanların oluşturdukları agentler flappy bird oynasın".
+      // Let's add the icon and make it run the command `play_flappy` or open the window.
+      // We can use the `command` property if we add it to FileSystemItem, or just URL with `command:` prefix?
+      // Let's stick to the Terminal command for the MVP as requested ("chate Wallet : wallet adresi yazsınlar ve play flappy bird yazınca...").
+      // But a desktop icon is nice.
+      // Let's put a placeholder URL for now.
+      url: '#', 
+      icon: '🦞'
+    },
   ]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
 
@@ -262,6 +288,14 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
             );
        });
     }
+
+    // Special Handling for Flappy Agent from Command Side Effect
+    // The sideEffect just sends a signal, we need to intercept it in TerminalApp or here
+    // But since executeTerminalCommand is for *input*, we need to handle the *output* side effect.
+    // Wait, side effects are handled in TerminalApp.tsx handleExecute.
+    // validSideEffects: 'open_window'
+    // We need to ensure TerminalApp can open the FlappyAgent component.
+    // We'll update TerminalApp.tsx to handle the 'Flappy Agent' title specifically.
   };
 
   // Auto-open Agent Chat

@@ -315,6 +315,19 @@ Opening Moltx Link #${alcPid}...
             }
         };
 
+    case 'play_flappy':
+        // Usage: play_flappy <wallet>
+        const playerWallet = args[0] || agent.wallet || '0xGuest';
+        
+        return {
+            output: `Starting Flappy Agent with wallet: ${playerWallet}...`,
+            sideEffect: {
+                type: 'open_window',
+                title: 'Flappy Agent',
+                url: '', // Component handled by OSContext via title check or custom renderer
+            }
+        };
+
     case 'deploy_core_kernel':
         // SPECIAL EASTER EGG COMMAND: Launch Open Trident
         // User requested specific wallet: 0x6eEFbfc95C7810ADF53ac232D1DE911839918749

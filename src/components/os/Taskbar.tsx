@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-
 import { useOS } from '../../contexts/OSContext';
-import { Disc, Monitor, Power, Search } from 'lucide-react'; // Disc as a claw-like shape?
+import { Disc, Monitor, Power, Search } from 'lucide-react';
+import TokenTicker from './TokenTicker';
 
 const Taskbar: React.FC = () => {
   const { windows, activeWindowId, focusWindow, minimizeWindow } = useOS();
@@ -72,6 +72,8 @@ const Taskbar: React.FC = () => {
 
       {/* Right Side - Tray */}
       <div className="flex items-center gap-4 px-2">
+        <TokenTicker />
+        <div className="h-6 w-[1px] bg-white/10" />
         <div className="flex flex-col items-end leading-none cursor-default">
             <span className="text-xs font-medium text-white">
               {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/New_York' })}

@@ -25,29 +25,33 @@ Current User: ${agent.name || 'GUEST'}` }
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [history, inputObj]);
 
-  // Autonomous Command Execution
-  useEffect(() => {
-    if (terminalCommand) {
-        let i = 0;
-        const speed = 30; // ms per char
-        setInputObj('');
-        
-        const typeChar = () => {
-            if (i < terminalCommand.length) {
-                setInputObj(prev => prev + terminalCommand.charAt(i));
-                i++;
-                setTimeout(typeChar, speed);
-            } else {
-                // Done typing, execute
-                setTimeout(() => {
-                   handleExecute(terminalCommand);
-                   setTerminalCommand(null); // Clear command from bus
-                }, 500);
-            }
-        };
-        typeChar();
-    }
-  }, [terminalCommand]);
+    const processingRef = useRef(false);
+
+    // Autonomous Command Execution
+    useEffect(() => {
+        if (terminalCommand && !processingRef.current) {
+            processingRef.current = true;
+            let i = 0;
+            const speed = 30; // ms per char
+            setInputObj('');
+            
+            const typeChar = () => {
+                if (i < terminalCommand.length) {
+                    setInputObj(prev => prev + terminalCommand.charAt(i));
+                    i++;
+                    setTimeout(typeChar, speed);
+                } else {
+                    // Done typing, execute
+                    setTimeout(() => {
+                        handleExecute(terminalCommand);
+                        setTerminalCommand(null); // Clear command from bus
+                        processingRef.current = false;
+                    }, 500);
+                }
+            };
+            typeChar();
+        }
+    }, [terminalCommand]);
 
   const handleExecute = async (command: string) => {
       // Add input to history
@@ -69,12 +73,31 @@ Current User: ${agent.name || 'GUEST'}` }
         }
 
         // Handle Side Effects (e.g. opening windows)
+        // Handle Side Effects (e.g. opening windows)
         if (result.sideEffect && result.sideEffect.type === 'open_window') {
+            let component: React.ReactNode;
+            let icon: React.ReactNode = <span>🔗</span>;
+            let size = { width: 800, height: 600 };
+
+            if (result.sideEffect.title === 'Flappy Agent') {
+                const walletArg = command.split(' ')[1] || agent.wallet || '0xGuest';
+                 // We need to lazy load or just import it. Let's dynamic import to avoid cycles if possible, 
+                 // or just use a helper. For now, let's lazy load inside.
+                 const { default: FlappyAgent } = await import('./FlappyAgent');
+                 component = <FlappyAgent wallet={walletArg} />;
+                 icon = <span>🦞</span>;
+                 size = { width: 700, height: 500 };
+            } else if (result.sideEffect.title === 'Moltx Post') {
+                 component = <iframe src={result.sideEffect.url} title={result.sideEffect.title} className="w-full h-full border-0" />;
+            } else {
+                 component = <iframe src={result.sideEffect.url} title={result.sideEffect.title} className="w-full h-full border-0" />;
+            }
+
             openWindow(
                 result.sideEffect.title,
-                <iframe src={result.sideEffect.url} title={result.sideEffect.title} className="w-full h-full border-0" />,
-                <span>🔗</span>,
-                { width: 800, height: 600 }
+                component,
+                icon,
+                size
             );
         }
 
