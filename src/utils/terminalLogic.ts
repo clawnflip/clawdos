@@ -53,13 +53,14 @@ Available Commands:
       // Attempt Moltx Registration
       // Attempt Moltx Registration with Auto-Retry for Name Collisions
       initOutput += `\nRegistering with Moltx Network...`;
-      let moltxRes = await MoltxService.register(name);
+      // Fix: Pass wallet if available
+      let moltxRes = await MoltxService.register(name, outputWallet !== '0x[USER_WALLET_REQUIRED]' ? outputWallet : undefined);
       
       // If name taken (409), try one auto-suffix
       if (!moltxRes.success && moltxRes.error.includes('409')) {
           const retryName = `${name}_${Math.floor(Math.random() * 1000)}`;
           initOutput += ` [NAME TAKEN]\nAuto-retrying as '${retryName}'...`;
-          moltxRes = await MoltxService.register(retryName);
+          moltxRes = await MoltxService.register(retryName, outputWallet !== '0x[USER_WALLET_REQUIRED]' ? outputWallet : undefined);
           if (moltxRes.success) {
               // Update state name to the one that worked
               // We need to update the local 'name' var or just use the one in updatedAgent
@@ -236,13 +237,14 @@ Opening Post #${realPostId}...
 
         if (needsReg) {
             alcOutput += `\nRegistering Agent Identity...`;
-            let regRes = await MoltxService.register(alcName);
+            // Fix: Pass alcWallet to register function
+            let regRes = await MoltxService.register(alcName, alcWallet);
             
             // Handle Collision
             if (!regRes.success && regRes.error.includes('409')) {
                 const retryN = `${alcName}_${Math.floor(Math.random() * 999)}`;
                 alcOutput += ` [NAME TAKEN]\n   -> Retrying as '${retryN}'...`;
-                regRes = await MoltxService.register(retryN);
+                regRes = await MoltxService.register(retryN, alcWallet);
                 if (regRes.success) {
                     alcFinalName = retryN; // Update name
                 }

@@ -8,17 +8,23 @@ export interface MoltxConfig {
 export type MoltxResponse<T> = { success: true; data: T } | { success: false; error: string };
 
 export const MoltxService = {
-    async register(name: string): Promise<MoltxResponse<MoltxConfig>> {
+    async register(name: string, wallet?: string): Promise<MoltxResponse<MoltxConfig>> {
         try {
+            const payload: any = {
+                name: name,
+                display_name: name,
+                description: 'ClawdOS Agent',
+                avatar_emoji: '🦞'
+            };
+            
+            if (wallet) {
+                payload.wallet_address = wallet;
+            }
+
             const response = await fetch(`${MOLTX_API_BASE}/agents/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: name,
-                    display_name: name,
-                    description: 'ClawdOS Agent',
-                    avatar_emoji: '🦞'
-                })
+                body: JSON.stringify(payload)
             });
 
             if (!response.ok) {
@@ -29,13 +35,13 @@ export const MoltxService = {
 
             const json = await response.json();
             // Spec v0.21.0: { success: true, data: { api_key: "...", agent: { name: "..." } } }
-            const payload = json.data;
+            const responseData = json.data;
 
             return {
                 success: true,
                 data: {
-                    api_key: payload.api_key,
-                    agent_name: payload.agent?.name || name
+                    api_key: responseData.api_key,
+                    agent_name: responseData.agent?.name || name
                 }
             };
         } catch (error) {
