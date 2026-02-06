@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+
 import { useOS } from '../../contexts/OSContext';
 import { Disc, Monitor, Power, Search } from 'lucide-react'; // Disc as a claw-like shape?
 
@@ -73,8 +73,12 @@ const Taskbar: React.FC = () => {
       {/* Right Side - Tray */}
       <div className="flex items-center gap-4 px-2">
         <div className="flex flex-col items-end leading-none cursor-default">
-            <span className="text-xs font-medium text-white">{format(time, 'HH:mm')}</span>
-            <span className="text-[10px] text-gray-400">{format(time, 'dd/MM/yyyy')}</span>
+            <span className="text-xs font-medium text-white">
+              {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/New_York' })}
+            </span>
+            <span className="text-[10px] text-gray-400">
+              {time.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'America/New_York' })}
+            </span>
         </div>
         <button className="text-gray-400 hover:text-white transition-colors">
             <Power size={18} />

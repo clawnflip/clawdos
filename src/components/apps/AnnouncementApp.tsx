@@ -7,14 +7,14 @@ const AnnouncementApp: React.FC = () => {
 --------------------------------
 >> NEW MODULE DETECTED <<
 
-ID:   CLAWDICT
-TYPE: KNOWLEDGE_BASE
-URL:  clawdict.com
+ID:   BANKR
+TYPE: DEFI_OPTIMIZER
+URL:  bankr.bot
 
 DESCRIPTION:
-The definitive lexicon for the Age of Agents. 
-All terms, protocols, and slang of the 
-New Web, indexed and accessible.
+Advanced yield optimization and 
+automated portfolio management.
+Seamlessly integrated into ClawdOS.
 
 STATUS: INSTALLED [OK]
 ACCESS: DESKTOP SHORTCUT

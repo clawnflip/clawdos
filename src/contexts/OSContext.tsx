@@ -154,6 +154,15 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       url: 'https://www.clawdict.com/',
       icon: 'https://pbs.twimg.com/profile_images/2017657129927139328/7FXsrH3v_400x400.jpg'
     },
+
+    { 
+      id: 'bankr', 
+      name: 'Bankr', 
+      type: 'link', 
+      parentId: 'desktop', 
+      url: 'https://bankr.bot/',
+      icon: 'https://pbs.twimg.com/profile_images/1951545493936545792/AriqgxQN_400x400.jpg'
+    },
   ]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
 
@@ -284,7 +293,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                      <AnnouncementApp />,
                      <span>📢</span>,
                      { width: 350, height: 400 },
-                     { x: 20, y: 50 }
+                     { x: (window.innerWidth / 2) - 175, y: 50 }
                  );
             });
     }
