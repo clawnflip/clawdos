@@ -9,7 +9,7 @@ interface IconProps {
 }
 
 const Icon: React.FC<IconProps> = ({ item }) => {
-  const { openWindow, files, moveFile } = useOS();
+  const { openWindow, moveFile } = useOS();
 
   const renderIconContent = () => {
     // Check if icon is a URL (starts with http/https) or emoji
@@ -35,15 +35,15 @@ const Icon: React.FC<IconProps> = ({ item }) => {
   const handleDoubleClick = () => {
     if (item.name === 'Claw Terminal') {
         import('../apps/TerminalApp').then(module => {
-            const TerminalApp = module.default;
-            openWindow(
-                'Claw Terminal',
-                <TerminalApp />,
-                <span className="font-mono text-xs font-bold">&gt;_</span>,
-                { width: 700, height: 500 }
-            );
-        });
-        return;
+             const TerminalApp = module.default;
+             openWindow(
+                 'Claw Terminal',
+                 <TerminalApp />,
+                 <span className="font-mono text-xs font-bold">&gt;_</span>,
+                 { width: 700, height: 500 }
+             );
+         });
+         return;
     }
 
     if (item.name === 'Agent Chat') {
@@ -87,7 +87,7 @@ const Icon: React.FC<IconProps> = ({ item }) => {
       className="flex flex-col items-center justify-center gap-1 w-24 h-28 p-2 rounded-lg hover:bg-white/10 cursor-pointer transition-colors group relative z-10"
       onDoubleClick={handleDoubleClick}
       whileDrag={{ scale: 1.1, zIndex: 50, cursor: 'grabbing' }}
-      onDragEnd={(e, info) => {
+      onDragEnd={(_, info) => {
         // Detect Drop Target
         // We look for elements with 'data-folder-id' under the cursor
         const dropTarget = document.elementFromPoint(info.point.x, info.point.y);

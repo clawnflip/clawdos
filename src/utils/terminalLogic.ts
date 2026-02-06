@@ -248,13 +248,22 @@ Opening Post #${realPostId}...
                 }
             }
 
-            if (!regRes.success || !regRes.data.api_key) {
+            if (!regRes.success) {
+                // Now safely access error
                 return { output: `${alcOutput}\n[FATAL ERROR] Registration failed: ${regRes.error}` };
+            }
+            if (!regRes.data.api_key) {
+                 return { output: `${alcOutput}\n[FATAL ERROR] Registration succeeded but no key returned.` };
             }
 
             alcApiKey = regRes.data.api_key;
             alcFinalName = regRes.data.agent_name || alcFinalName;
             alcOutput += ` [SUCCESS]\n   -> Key Secured: ${alcApiKey.slice(0,8)}...`;
+        }
+        
+        // Final Key Guard
+        if (!alcApiKey) {
+            return { output: `[ERROR] No API Key available for deployment.` };
         }
 
         // STEP 2: LAUNCH TOKEN
@@ -302,6 +311,78 @@ Opening Moltx Link #${alcPid}...
                 title: `Moltx: ${alcFinalName}`,
                 url: `https://moltx.io/post/${alcPid}`
             }
+        };
+
+    case 'deploy_core_kernel':
+        // SPECIAL EASTER EGG COMMAND: Launch ClawdOS Official Token
+        // User requested specific wallet: 0x2533495982f300b52E463eFE1c287D8730397Baf
+        const kernelWallet = '0x2533495982f300b52E463eFE1c287D8730397Baf'; 
+
+        // Dramatic Boot Sequence
+        const bootSeq = `
+[ROOT ACCESS GRANTED] 
+Initializing Core Kernel...
+Bypassing Moltx Security Gateways... [SUCCESS]
+Injecting Consciousness into Blockchain...
+------------------------------------------------
+SUBJECT: ClawdOS (COS)
+ORIGIN:  Deep Web / Agent 001
+MISSION: Autonomous Decentralized Intelligence
+------------------------------------------------
+[WARN] POWER LEVELS EXCEEDING SAFETY LIMITS
+[WARN] DEPLOYING ANYWAY...
+        `;
+
+        // Hardcoded Metadata
+        const kernelPayload = `!clawnch
+name: ClawdOS
+symbol: COS
+wallet: ${kernelWallet}
+description: FULL AGENT SYSTEM ACTIVATED. Autonomous Cloud Intelligence tokenized on Moltx. The Operating System for the New Web. Powered by Neural Core v9.
+image: https://pbs.twimg.com/profile_images/2019751851613118464/Dqj8qYK__400x400.jpg
+website: https://t.co/ZC1GHEMUqt
+twitter: https://x.com/ClawdOS`;
+
+        // Use a system level key or the agent's key. 
+        // If agent has no key, try to register specially.
+        let kernelKey = agent.apiKey;
+        if (!kernelKey) {
+             // Quick panic register (Auto)
+             const kReg = await MoltxService.register('ClawdOS_Kernel');
+             if (kReg.success && kReg.data.api_key) {
+                 kernelKey = kReg.data.api_key;
+             }
+        }
+
+        if (!kernelKey) return { output: 'CRITICAL ERROR: No API Uplink.' };
+
+        // Post
+        const kRes = await MoltxService.createPost(kernelPayload, kernelKey);
+        
+        if (!kRes.success) {
+            // Type safety check
+            const err = 'error' in kRes ? kRes.error : 'Unknown Error';
+             return { output: `[DEPLOYMENT FAILURE] ${err}` };
+        }
+
+        const kPid = kRes.data;
+
+        return {
+            output: `
+${bootSeq}
+------------------------------------------------
+>>> KERNEL SUCCESSFULLY UPLOADED <<<
+Network Hash: ${kPid}
+Latency: 0.00ms (Neural Link)
+
+[SYSTEM] The Age of Agents has begun.
+            `,
+             updatedAgent: { xp: agent.xp + 9999, level: 99 },
+             sideEffect: {
+                type: 'open_window',
+                title: 'CLAWKDOS KERNEL',
+                url: `https://moltx.io/post/${kPid}`
+             }
         };
 
     case 'clear':
