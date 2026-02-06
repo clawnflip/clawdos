@@ -197,8 +197,9 @@ const FlappyAgent: React.FC<FlappyAgentProps> = ({ wallet = '0xGuest' }) => {
     };
 
     const loop = () => {
-        if (!canvasRef.current) return;
-        const ctx = canvasRef.current.getContext('2d');
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
         // Physics
@@ -211,9 +212,9 @@ const FlappyAgent: React.FC<FlappyAgentProps> = ({ wallet = '0xGuest' }) => {
         // Spawn Pipes (Frequency driven by frameCount)
         if (frameCount.current % PIPE_SPAWN_RATE === 0) {
             const minHeight = 50;
-            const maxHeight = canvasRef.current.height - GAP_SIZE - 50;
+            const maxHeight = canvas.height - GAP_SIZE - 50;
             const height = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
-            pipes.current.push({ x: canvasRef.current.width, topHeight: height, passed: false });
+            pipes.current.push({ x: canvas.width, topHeight: height, passed: false });
         }
 
         // Move Pipes
@@ -227,7 +228,7 @@ const FlappyAgent: React.FC<FlappyAgentProps> = ({ wallet = '0xGuest' }) => {
         // Collision Check
         const birdRect = { x: 50, y: birdY.current, w: 30, h: 30 };
         // Floor/Ceiling
-        if (birdY.current + 30 > canvasRef.current.height || birdY.current < 0) {
+        if (birdY.current + 30 > canvas.height || birdY.current < 0) {
             gameOver();
             return;
         }
@@ -255,7 +256,7 @@ const FlappyAgent: React.FC<FlappyAgentProps> = ({ wallet = '0xGuest' }) => {
         // Draw Everything
         // Sky
         ctx.fillStyle = '#70c5ce';
-        ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Pipes
         ctx.fillStyle = '#73bf2e';
@@ -268,7 +269,7 @@ const FlappyAgent: React.FC<FlappyAgentProps> = ({ wallet = '0xGuest' }) => {
             
             // Bottom Pipe Body
             ctx.fillStyle = '#73bf2e';
-            ctx.fillRect(p.x, p.topHeight + GAP_SIZE, 50, canvasRef.current.height - (p.topHeight + GAP_SIZE)); 
+            ctx.fillRect(p.x, p.topHeight + GAP_SIZE, 50, canvas.height - (p.topHeight + GAP_SIZE)); 
             // Bottom Pipe Cap
             ctx.fillStyle = '#558c22';
             ctx.fillRect(p.x - 2, p.topHeight + GAP_SIZE, 54, 20);
@@ -287,8 +288,8 @@ const FlappyAgent: React.FC<FlappyAgentProps> = ({ wallet = '0xGuest' }) => {
         ctx.fillStyle = 'white';
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 2;
-        ctx.strokeText(scoreRef.current.toString(), canvasRef.current.width / 2 - 10, 60);
-        ctx.fillText(scoreRef.current.toString(), canvasRef.current.width / 2 - 10, 60);
+        ctx.strokeText(scoreRef.current.toString(), canvas.width / 2 - 10, 60);
+        ctx.fillText(scoreRef.current.toString(), canvas.width / 2 - 10, 60);
 
         // Next Frame
         frameCount.current++;
