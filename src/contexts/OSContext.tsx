@@ -141,6 +141,14 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       icon: 'https://pbs.twimg.com/profile_images/2018321879409307648/gqYF-un7_400x400.jpg'
     },
     { 
+      id: 'moltbunker', 
+      name: 'MoltBunker', 
+      type: 'link', 
+      parentId: 'desktop', 
+      url: 'https://moltbunker.com/',
+      icon: 'https://moltbunker.com/moltbot_head.png'
+    },
+    { 
       id: 'data_terminal', 
       name: 'Data Terminal', 
       type: 'link', 
