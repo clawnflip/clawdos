@@ -18,7 +18,7 @@ const Icon: React.FC<IconProps> = ({ item }) => {
     }
     
     // Explicit overrides/fallbacks
-    if (item.name === 'Clawnch') return <span className="text-5xl drop-shadow-md">🚀</span>;
+    if (item.name === 'Clawnch') return <span className="text-5xl drop-shadow-md">🦞</span>;
     if (item.name === 'Claw Terminal') return <span className="text-5xl drop-shadow-md font-mono text-green-500">&gt;_</span>;
     if (item.name === 'Agent Chat') return <span className="text-5xl drop-shadow-md">💬</span>;
     if (item.name === 'My Computer') return <Anchor size={48} className="text-[var(--color-lobster-accent)]" />;

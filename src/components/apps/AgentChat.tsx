@@ -1,18 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useOS } from '../../contexts/OSContext';
-import { Send, User, Bot, Sparkles, Terminal } from 'lucide-react';
-import { parseIntent } from '../../utils/intentParser';
+import { Send, User, Bot, Sparkles } from 'lucide-react';
 import Logo from '../os/Logo';
+import { fal } from "@fal-ai/client";
+import { CLAW_OS_SYSTEM_PROMPT } from '../../utils/systemPrompt';
+
+// Configure fal with the proxy or client key
+// We use the exposed key for this demo.
+fal.config({ credentials: import.meta.env.VITE_FAL_KEY }); 
 
 const AgentChat: React.FC = () => {
-  const { agent, executeTerminalCommand, openWindow } = useOS();
+  const { agent, executeTerminalCommand } = useOS();
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Array<{ sender: 'user' | 'agent', text: string, type?: 'info' | 'error' | 'success' }>>([
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [messages, setMessages] = useState<Array<{ sender: 'user' | 'agent', text: string }>>([
     { 
         sender: 'agent', 
         text: agent.name 
-            ? `Greetings, ${agent.name}. I am ready for operations.` 
-            : `SYSTEM HALTED. Identity Verification Required.\n\nPlease provide your AGENT NAME and WALLET ADDRESS (0x...) to initialize.` 
+            ? `Online. Connected to ${agent.name}.` 
+            : `SYSTEM HALTED. Identity Verification Required.\n\nPlease provide your NAME and WALLET ADDRESS to initialize.` 
     }
   ]);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -21,51 +27,76 @@ const AgentChat: React.FC = () => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isStreaming) return;
 
-    // Add User Message
     const userMsg = input;
     setMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
     setInput('');
+    setIsStreaming(true);
 
-    // ONBOARDING FLOW: If agent is not initialized
-    if (!agent.name) {
-         const walletMatch = userMsg.match(/(0x[a-fA-F0-9]{40})/);
-         // Name is roughly the rest, simplified
-         const name = userMsg.replace(/(0x[a-fA-F0-9]{40})/, '').replace(/my name is/i, '').replace(/initialize/i, '').replace(/agent/i, '').trim() || 'Agent-01';
-         
-         if (walletMatch) {
-             const wallet = walletMatch[0];
-             const cmd = `init ${name} ${wallet}`;
-             
-             setMessages(prev => [...prev, { sender: 'agent', text: `Identity confirmed. Initializing ${name}...` }]);
-             executeTerminalCommand(cmd);
-         } else {
-             setTimeout(() => {
-                 setMessages(prev => [...prev, { sender: 'agent', text: "I need a valid Wallet Address (starts with 0x) to initialize. Please provide your Name and Wallet." }]);
-             }, 500);
-         }
-         return;
+    try {
+        // Prepare context for the AI
+        const contextPrompt = `
+        CURRENT STATE:
+        - Agent Name: ${agent.name || "Unknown"}
+        - Agent Wallet: ${agent.wallet || "Unknown"}
+        
+        USER INPUT:
+        ${userMsg}
+        `;
+
+        const stream = await fal.stream("openrouter/router", {
+            input: {
+                prompt: contextPrompt,
+                model: "anthropic/claude-sonnet-4.5",
+                system_prompt: CLAW_OS_SYSTEM_PROMPT,
+                // @ts-ignore
+                messages: messages.map(m => ({ role: m.sender, content: m.text })) 
+            }
+        });
+
+        // Create a placeholder for the agent's response
+        setMessages(prev => [...prev, { sender: 'agent', text: '' }]);
+        let fullResponse = '';
+
+        for await (const event of stream) {
+            // Handle various potential output formats
+            // @ts-ignore
+            const chunk = event.chunk || event.text || event.output || (typeof event === 'string' ? event : '');
+            
+            if (chunk) {
+                // heuristic to detect if the API is sending cumulative text vs deltas
+                if (fullResponse && typeof chunk === 'string' && chunk.startsWith(fullResponse)) {
+                    fullResponse = chunk;
+                } else {
+                    fullResponse += chunk;
+                }
+
+                setMessages(prev => {
+                    const newArr = [...prev];
+                    const lastMsg = newArr[newArr.length - 1];
+                    if (lastMsg.sender === 'agent') {
+                        lastMsg.text = fullResponse; // Update streaming text
+                    }
+                    return newArr;
+                });
+            }
+        }
+
+        // Post-processing: Check for commands
+        const commandMatch = fullResponse.match(/\[\[COMMAND:\s*(.*?)\]\]/);
+        if (commandMatch) {
+            const cmd = commandMatch[1].trim();
+            executeTerminalCommand(cmd);
+        }
+
+    } catch (error) {
+        console.error("Fal.ai Error:", error);
+        setMessages(prev => [...prev, { sender: 'agent', text: "Connection to Neural Core failed. check console." }]);
+    } finally {
+        setIsStreaming(false);
     }
-
-    // NORMAL FLOW
-    const command = parseIntent(userMsg);
-    
-    setTimeout(() => {
-      // Logic for missing wallet - handled in terminal logic or here?
-      // Let's pass the command to terminal logic, but if init is needed, terminal will say so.
-      
-      if (command) {
-        setMessages(prev => [...prev, { sender: 'agent', text: `Initiating protocol: ${command.split(' ')[0]}...` }]);
-        executeTerminalCommand(command);
-      } else {
-        setMessages(prev => [...prev, { 
-            sender: 'agent', 
-            text: "I didn't recognize that command. Try: 'Launch token [Name] ticker [Symbol]'" 
-        }]);
-      }
-    }, 500);
   };
 
   return (
@@ -91,12 +122,17 @@ const AgentChat: React.FC = () => {
             )}
 
             <div className={`
-              max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed shadow-lg backdrop-blur-md
+              max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed shadow-lg backdrop-blur-md whitespace-pre-wrap
               ${msg.sender === 'user' 
                 ? 'bg-gradient-to-br from-[var(--color-lobster-accent)] to-[#ff4500] text-black font-medium rounded-tr-none' 
                 : 'bg-white/10 border border-white/10 text-gray-100 rounded-tl-none'}
             `}>
-               {msg.text}
+               {/* Clean the message for display: remove commands and thinking tags */}
+               {msg.text.replace(/\[\[COMMAND:.*?\]\]/g, '').replace(/<thinking>[\s\S]*?<\/thinking>/g, '').trim() || (isStreaming && idx === messages.length - 1 ? '' : '...')}
+               
+               {msg.sender === 'agent' && isStreaming && idx === messages.length - 1 && (
+                   <span className="inline-block w-2 h-4 ml-1 bg-[var(--color-lobster-accent)] animate-pulse"/>
+               )}
             </div>
 
             {msg.sender === 'user' && (
@@ -116,14 +152,15 @@ const AgentChat: React.FC = () => {
             type="text" 
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Command your agent..."
-            className="flex-1 bg-transparent px-3 py-2 text-sm outline-none text-white placeholder-white/30"
+            onKeyDown={(e) => e.key === 'Enter' && !isStreaming && handleSend()}
+            placeholder={isStreaming ? "Neural Core Processing..." : "Command your agent..."}
+            disabled={isStreaming}
+            className="flex-1 bg-transparent px-3 py-2 text-sm outline-none text-white placeholder-white/30 disabled:opacity-50"
             />
             <button 
             onClick={handleSend}
             className="p-2 bg-[var(--color-lobster-accent)] text-black rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-            disabled={!input.trim()}
+            disabled={!input.trim() || isStreaming}
             >
             <Send size={16} />
             </button>

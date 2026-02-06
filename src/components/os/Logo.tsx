@@ -9,7 +9,7 @@ const Logo: React.FC<LogoProps> = ({ className = "w-10 h-10", showText = true })
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       {/* Icon */}
-      <div className="relative group shrink-0 w-full h-full max-w-[3rem] max-h-[3rem] aspect-square">
+      <div className="relative group shrink-0 w-full h-full aspect-square">
         <svg 
             viewBox="0 0 100 100" 
             className="w-full h-full drop-shadow-[0_0_10px_rgba(255,69,0,0.5)] transition-all duration-300 group-hover:drop-shadow-[0_0_20px_rgba(255,69,0,0.8)]"
@@ -43,12 +43,12 @@ const Logo: React.FC<LogoProps> = ({ className = "w-10 h-10", showText = true })
       
       {/* Text */}
       {showText && (
-          <div className="flex flex-col leading-none">
+          <div className="flex flex-col leading-none justify-center">
             <span className="font-extrabold text-white tracking-widest text-lg font-sans">
                 CLAWD<span className="text-[var(--color-lobster-accent)]">OS</span>
             </span>
-            <span className="text-[0.6rem] text-white/50 tracking-[0.2em] font-mono">
-                INTELLIGENCE
+            <span className="text-[0.5em] text-white/50 tracking-[0.3em] font-mono uppercase">
+                Intelligence
             </span>
           </div>
       )}

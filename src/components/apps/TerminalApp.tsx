@@ -3,7 +3,8 @@ import { useOS } from '../../contexts/OSContext';
 import { processCommand } from '../../utils/terminalLogic';
 
 const TerminalApp: React.FC = () => {
-  const { agent, setAgent, terminalCommand, setTerminalCommand } = useOS();
+  const { agent, setAgent, terminalCommand, setTerminalCommand, openWindow } = useOS();
+  
   const [history, setHistory] = useState<Array<{ type: 'input' | 'output', content: string }>>([
     { type: 'output', content: `Welcome to ClawdOS Terminal v1.0\nType 'help' to see available commands.\n--------------------------------\nCurrent User: ${agent.name || 'GUEST'}` }
   ]);
@@ -39,7 +40,7 @@ const TerminalApp: React.FC = () => {
     }
   }, [terminalCommand]);
 
-  const handleExecute = (command: string) => {
+  const handleExecute = async (command: string) => {
       // Add input to history
       setHistory(prev => [...prev, { type: 'input', content: command }]);
 
@@ -50,15 +51,30 @@ const TerminalApp: React.FC = () => {
           return;
       }
 
-      const result = processCommand(command, agent);
-      
-      // Update agent state if needed
-      if (result.updatedAgent) {
-        setAgent(prev => ({ ...prev, ...result.updatedAgent }));
-      }
+      try {
+        const result = await processCommand(command, agent);
+        
+        // Update agent state if needed
+        if (result.updatedAgent) {
+            setAgent(prev => ({ ...prev, ...result.updatedAgent }));
+        }
 
-      // Add output to history
-      setHistory(prev => [...prev, { type: 'output', content: result.output }]);
+        // Handle Side Effects (e.g. opening windows)
+        if (result.sideEffect && result.sideEffect.type === 'open_window') {
+            openWindow(
+                result.sideEffect.title,
+                <iframe src={result.sideEffect.url} title={result.sideEffect.title} className="w-full h-full border-0" />,
+                <span>🔗</span>,
+                { width: 800, height: 600 }
+            );
+        }
+
+        // Add output to history
+        setHistory(prev => [...prev, { type: 'output', content: result.output }]);
+      } catch (err) {
+         setHistory(prev => [...prev, { type: 'output', content: `Runtime Error: ${err}` }]);
+      }
+      
       setInputObj('');
   };
 

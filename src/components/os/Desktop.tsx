@@ -63,15 +63,17 @@ const Desktop: React.FC = () => {
     <div 
         id="desktop-area"
         ref={desktopRef}
-        className="relative w-full h-full overflow-hidden"
+        className="relative w-full h-full overflow-hidden bg-gray-900" // Added bg-gray-900 to ensure visibility
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onContextMenu={handleContextMenu}
     >
+        {/* Debug Indicator - Will remove later */}
+        {/* <div className="absolute top-0 right-0 p-2 text-xs text-green-500 z-50">Desktop Mounted</div> */}
         {/* Background Logo */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-           <Logo className="w-1/3 h-1/3 blur-[2px]" showText={true} />
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
+           <Logo className="w-1/3 h-1/3" showText={true} />
         </div>
         
       {/* Desktop Icons Grid - Absolute positioning to allow free movement (simulated via drag) */}

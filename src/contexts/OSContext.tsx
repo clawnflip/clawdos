@@ -34,7 +34,12 @@ export interface AgentState {
   skills: string[];
   level: number;
   xp: number;
+  apiKey?: string;
 }
+
+// ...
+
+
 
 interface OSContextType {
   windows: WindowState[];
@@ -129,22 +134,115 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
   ]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
 
+  const getNextZIndex = () => {
+    const maxZ = Math.max(0, ...windows.map(w => w.zIndex));
+    return maxZ + 1;
+  };
+
+  const openWindow = (title: string, component: ReactNode, icon?: ReactNode, initialSize?: { width: number, height: number }) => {
+    const id = uuidv4();
+    const newWindow: WindowState = {
+      id,
+      title,
+      component,
+      icon,
+      isOpen: true,
+      isMinimized: false,
+      isMaximized: false,
+      zIndex: getNextZIndex(),
+      width: initialSize?.width || 800,
+      height: initialSize?.height || 600,
+      x: 100 + (windows.length * 30),
+      y: 50 + (windows.length * 30),
+    };
+    setWindows(prev => [...prev, newWindow]);
+    setActiveWindowId(id);
+  };
+
+  const closeWindow = (id: string) => {
+    setWindows(prev => prev.filter(w => w.id !== id));
+    if (activeWindowId === id) {
+      setActiveWindowId(null);
+    }
+  };
+
+  const minimizeWindow = (id: string) => {
+    setWindows(prev => prev.map(w => w.id === id ? { ...w, isMinimized: true } : w));
+    if (activeWindowId === id) setActiveWindowId(null);
+  };
+
+  const maximizeWindow = (id: string) => {
+    setWindows(prev => prev.map(w => w.id === id ? { ...w, isMaximized: !w.isMaximized } : w));
+    focusWindow(id);
+  };
+
+  const focusWindow = (id: string) => {
+    setActiveWindowId(id);
+    setWindows(prev => prev.map(w => w.id === id ? { ...w, isMinimized: false, zIndex: getNextZIndex() } : w));
+  };
+
+  const createFile = (name: string, type: 'file' | 'folder' | 'link', parentId: string = 'desktop', content?: string) => {
+    const newFile: FileSystemItem = {
+      id: uuidv4(),
+      name,
+      type,
+      parentId,
+      content,
+    };
+    setFiles(prev => [...prev, newFile]);
+  };
+
+  const moveFile = (fileId: string, newParentId: string) => {
+    setFiles(prev => prev.map(f => f.id === fileId ? { ...f, parentId: newParentId } : f));
+  };
+  
+  const [terminalCommand, setTerminalCommand] = useState<string | null>(null);
+
+  const executeTerminalCommand = (cmd: string) => {
+    setTerminalCommand(cmd);
+    
+    // Process command immediately to handle side effects that need OS access (like opening windows)
+    // Note: TerminalApp also calls processCommand for display, but side effects should be handled here or there.
+    // Ideally, we let TerminalApp handle the logic, but since we want the OS to react even if Terminal is backgrounded...
+    // Actually, TerminalLogic is pure. Let's run it here just to check for side effects.
+    
+    // We delegate execution logic to TerminalApp to avoid double-processing and state desync.
+    // The command is passed via 'terminalCommand' state, which TerminalApp listens to.
+
+    const terminalOpen = windows.find(w => w.title === 'Claw Terminal');
+    if (!terminalOpen) {
+       import('../components/apps/TerminalApp').then(module => {
+            const TerminalApp = module.default;
+             openWindow(
+                'Claw Terminal',
+                <TerminalApp />,
+                <span className="font-mono text-xs font-bold text-green-500">&gt;_</span>,
+                { width: 700, height: 500 }
+            );
+       });
+    }
+  };
+
   // Auto-open Agent Chat
   useEffect(() => {
     if (!initRef.current) {
         initRef.current = true;
+        console.log("OSContext: Initializing...");
         
-        // Check if already open (paranoid check)
-        // Since this runs once on mount, windows is likely empty, but safe to just run.
-        import('../components/apps/AgentChat').then(module => {
-            const AgentChat = module.default;
-            openWindow(
-                'Agent Chat',
-                <AgentChat />,
-                <span>💬</span>,
-                { width: 400, height: 600 }
-            );
-        });
+        import('../components/apps/AgentChat')
+            .then(module => {
+                console.log("OSContext: AgentChat loaded");
+                const AgentChat = module.default;
+                openWindow(
+                    'Agent Chat',
+                    <AgentChat />,
+                    <span>💬</span>,
+                    { width: 400, height: 600 }
+                );
+            })
+            .catch(err => {
+                console.error("OSContext: Failed to load AgentChat", err);
+            });
     }
   }, []);
 
