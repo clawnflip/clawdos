@@ -206,6 +206,14 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       url: '#', 
       icon: '🦞'
     },
+    {
+      id: 'ans_app',
+      name: 'ANS',
+      type: 'link',
+      parentId: 'desktop',
+      url: 'https://a-n-s.space/',
+      icon: 'https://a-n-s.space/logo.svg'
+    },
   ]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
 
