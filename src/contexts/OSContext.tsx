@@ -214,6 +214,14 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       url: 'https://a-n-s.space/',
       icon: 'https://a-n-s.space/logo.svg'
     },
+    {
+      id: 'clawnch_market_cap',
+      name: 'Clawnch Market Cap',
+      type: 'link',
+      parentId: 'desktop',
+      url: 'https://clawnchmarketcap.com/',
+      icon: 'https://clawnchmarketcap.com/assets/logo-icon-Dx_mHtr0.png'
+    },
   ]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
 
