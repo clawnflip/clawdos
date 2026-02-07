@@ -86,6 +86,19 @@ const Icon: React.FC<IconProps> = ({ item }) => {
         return;
     }
 
+    if (item.name === 'ClawdOS Store') {
+        import('../apps/ClawdOSStore').then(module => {
+            const ClawdOSStore = module.default;
+            openWindow(
+                'ClawdOS Store',
+                <ClawdOSStore />,
+                <img src="/ClawdOStore.png" alt="Store" className="w-8 h-8" />,
+                { width: 900, height: 700 }
+            );
+        });
+        return;
+    }
+
     if (item.type === 'link' && item.url) {
         openWindow(
             item.name, 
@@ -100,6 +113,17 @@ const Icon: React.FC<IconProps> = ({ item }) => {
                 <FolderWindow folderId={item.id} />,
                 <Folder size={16} />,
                 { width: 500, height: 400 }
+            );
+        });
+    } else if (item.type === 'file' && item.content) {
+        // Assume it's a mini app for now since we only use files for this
+        import('../apps/MiniAppRunner').then(module => {
+            const MiniAppRunner = module.default;
+            openWindow(
+                item.name,
+                <MiniAppRunner initialCode={item.content} appId={item.id} />,
+                <span>📱</span>,
+                { width: 400, height: 600 }
             );
         });
     }

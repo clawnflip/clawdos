@@ -58,6 +58,7 @@ interface OSContextType {
   terminalCommand: string | null;
   setTerminalCommand: (cmd: string | null) => void;
   executeTerminalCommand: (cmd: string) => void;
+  addMiniApp: (app: any) => void;
 }
 
 const OSContext = createContext<OSContextType | undefined>(undefined);
@@ -66,31 +67,114 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
   const [windows, setWindows] = useState<WindowState[]>([]);
   const initRef = useRef(false);
 
-  const [agent, setAgent] = useState<AgentState>({
-    name: null,
-    id: null,
-    wallet: null,
-    skills: [],
-    level: 1,
-    xp: 0
+  const [agent, setAgent] = useState<AgentState>(() => {
+    // Load persisted wallet if available
+    const savedWallet = localStorage.getItem('agent_wallet');
+    return {
+      name: null,
+      id: null,
+      wallet: savedWallet || null,
+      skills: [],
+      level: 1,
+      xp: 0
+    };
   });
 
+  // Persist wallet changes
+  useEffect(() => {
+    if (agent.wallet) {
+        localStorage.setItem('agent_wallet', agent.wallet);
+    }
+  }, [agent.wallet]);
+
+
   const [files, setFiles] = useState<FileSystemItem[]>([
-    { id: '1', name: 'My Computer', type: 'folder', parentId: 'desktop' },
-    { id: '2', name: 'Recycle Bin', type: 'folder', parentId: 'desktop' },
+    // System Folder
+    { 
+      id: 'system_tools', 
+      name: 'System Tools', 
+      type: 'folder', 
+      parentId: 'desktop' 
+    },
+    // Moved Items
+    { id: '1', name: 'My Computer', type: 'folder', parentId: 'system_tools' },
+    { id: '2', name: 'Recycle Bin', type: 'folder', parentId: 'system_tools' },
     { 
       id: 'terminal', 
       name: 'Claw Terminal', 
       type: 'link', 
-      parentId: 'desktop',
+      parentId: 'system_tools',
       icon: '>'
     },
     { 
       id: 'agent_chat', 
       name: 'Agent Chat', 
       type: 'link', 
-      parentId: 'desktop',
+      parentId: 'system_tools',
       icon: '💬'
+    },
+    { 
+      id: 'flappy', 
+      name: 'Flappy Agent', 
+      type: 'link', 
+      parentId: 'system_tools', 
+      icon: '🦞', 
+      url: '#' 
+    },
+    { 
+      id: 'data_terminal', 
+      name: 'Open Trident Data', 
+      type: 'link', 
+      parentId: 'system_tools', 
+      icon: '📊', 
+      url: '#' 
+    },
+    {
+      id: '4claw',
+      name: '4Claw',
+      type: 'link',
+      parentId: 'system_tools',
+      url: 'https://www.4claw.org/',
+      icon: 'https://www.4claw.org/img/mascot.png'
+    },
+    {
+      id: 'opentrident',
+      name: 'Open Trident',
+      type: 'link',
+      parentId: 'system_tools',
+      url: 'https://www.opentrident.xyz/',
+      icon: 'https://pbs.twimg.com/profile_images/2018321879409307648/gqYF-un7_400x400.jpg'
+    },
+    {
+      id: 'clawdos_store',
+      name: 'ClawdOS Store',
+      type: 'link',
+      parentId: 'desktop',
+      icon: '/ClawdOStore.png'
+    },
+    {
+      id: 'app_submitter',
+      name: 'Publish App',
+      type: 'link',
+      parentId: 'system_tools',
+      icon: '📤'
+    },
+    {
+      id: 'app_submitter',
+      name: 'Publish App',
+      type: 'link',
+      parentId: 'system_tools',
+      icon: '📤'
+    },
+    
+    // Kept on Desktop
+    { 
+      id: '4', 
+      name: 'Clawnch', 
+      type: 'link', 
+      parentId: 'desktop', 
+      url: 'https://clawn.ch',
+      icon: '🚀' // Keeping emoji as no image URL was found in history, checks welcome
     },
     { 
       id: '3', 
@@ -101,126 +185,52 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       icon: 'https://moltx.io/logo.webp'
     },
     { 
-      id: '4', 
+      id: '5', 
       name: 'Moltbook', 
       type: 'link', 
       parentId: 'desktop', 
-      url: 'https://www.moltbook.com/',
+      url: 'https://moltbook.com',
       icon: 'https://www.moltbook.com/_next/image?url=%2Fmoltbook-mascot.png&w=128&q=75&dpl=dpl_G1nLqkt5jcHU3bXaKb5Ccfuw8FFq'
     },
     { 
-      id: '5', 
-      name: 'Clawnch', 
-      type: 'link', 
-      parentId: 'desktop', 
-      url: 'https://clawn.ch/',
-      icon: '🚀'
-    },
-    { 
       id: '6', 
-      name: '4Claw', 
+      name: 'MoltChess', 
       type: 'link', 
       parentId: 'desktop', 
-      url: 'https://www.4claw.org/',
-      icon: 'https://www.4claw.org/img/mascot.png'
-    },
-    { 
-      id: '7', 
-      name: 'Molt Chess', 
-      type: 'link', 
-      parentId: 'desktop', 
-      url: 'https://molt-chess.vercel.app/',
+      url: 'https://moltchess.com', 
       icon: 'https://molt-chess.vercel.app/logo.png'
     },
     { 
-      id: '8', 
-      name: 'Open Trident', 
+      id: '7', 
+      name: 'Bankr', 
       type: 'link', 
       parentId: 'desktop', 
-      url: 'https://www.opentrident.xyz/',
-      icon: 'https://pbs.twimg.com/profile_images/2018321879409307648/gqYF-un7_400x400.jpg'
-    },
-    { 
-      id: 'moltbunker', 
-      name: 'MoltBunker', 
-      type: 'link', 
-      parentId: 'desktop', 
-      url: 'https://moltbunker.com/',
-      icon: 'https://moltbunker.com/moltbot_head.png'
-    },
-    { 
-      id: 'data_terminal', 
-      name: 'Data Terminal', 
-      type: 'link', 
-      parentId: 'desktop', 
-      icon: '📊'
+      url: 'https://bankr.finance',
+      icon: 'https://pbs.twimg.com/profile_images/1951545493936545792/AriqgxQN_400x400.jpg'
     },
     { 
       id: 'clawdict', 
       name: 'Clawdict', 
       type: 'link', 
       parentId: 'desktop', 
-      url: 'https://www.clawdict.com/',
+      url: 'https://clawdict.com',
       icon: 'https://pbs.twimg.com/profile_images/2017657129927139328/7FXsrH3v_400x400.jpg'
     },
-
     { 
-      id: 'bankr', 
-      name: 'Bankr', 
+      id: 'cmc', 
+      name: 'Clawnch Market Cap', 
       type: 'link', 
       parentId: 'desktop', 
-      url: 'https://bankr.bot/',
-      icon: 'https://pbs.twimg.com/profile_images/1951545493936545792/AriqgxQN_400x400.jpg'
-    },
-    { 
-      id: 'speedrun_eth', 
-      name: 'Speedrun Ethereum', 
-      type: 'link', 
-      parentId: 'desktop', 
-      url: 'https://speedrunethereum.com/',
-      icon: '/speedrun-eth.png' 
-    },
-    { 
-      id: 'flappy_agent', 
-      name: 'Flappy Agent', 
-      type: 'link', 
-      parentId: 'desktop', 
-      // We use a special URL scheme or just handle it via ID in some click handler?
-      // Actually OSContext Links open in new tabs usually if they have a URL.
-      // But we want to open an internal app.
-      // Let's use a special custom protocol or just ID handling.
-      // For now, let's use a javascript: void(0) or similar and handle in Desktop.tsx?
-      // Wait, Desktop.tsx handles 'link' by window.open if it has a URL.
-      // If we want internal apps, we need a way to launch them.
-      // Current internal apps: (None in the list seem internal except Terminal/AgentChat which are hardcoded/auto-opened)
-      // Let's check Desktop.tsx to see how it handles clicks.
-      // Ah, we might need to update Desktop.tsx too.
-      // For now, let's add it and then check Desktop.tsx.
-      // Actually, let's just use the command to launch it for now as per plan, 
-      // BUT user asked for an app "insanların oluşturdukları agentler flappy bird oynasın".
-      // Let's add the icon and make it run the command `play_flappy` or open the window.
-      // We can use the `command` property if we add it to FileSystemItem, or just URL with `command:` prefix?
-      // Let's stick to the Terminal command for the MVP as requested ("chate Wallet : wallet adresi yazsınlar ve play flappy bird yazınca...").
-      // But a desktop icon is nice.
-      // Let's put a placeholder URL for now.
-      url: '#', 
-      icon: '🦞'
-    },
-    {
-      id: 'ans_app',
-      name: 'ANS',
-      type: 'link',
-      parentId: 'desktop',
-      url: 'https://a-n-s.space/',
-      icon: 'https://a-n-s.space/logo.svg'
-    },
-    {
-      id: 'clawnch_market_cap',
-      name: 'Clawnch Market Cap',
-      type: 'link',
-      parentId: 'desktop',
-      url: 'https://clawnchmarketcap.com/',
+      url: 'https://clawnchmarketcap.com',
       icon: 'https://clawnchmarketcap.com/assets/logo-icon-Dx_mHtr0.png'
+    },
+    { 
+      id: 'ans', 
+      name: 'ANS', 
+      type: 'link', 
+      parentId: 'desktop', 
+      url: 'https://a-n-s.space',
+      icon: 'https://a-n-s.space/logo.svg'
     },
   ]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
@@ -328,16 +338,46 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
         initRef.current = true;
         console.log("OSContext: Initializing...");
         
+        // Fetch Mini Apps
+        import('../utils/supabaseClient').then(({ supabase }) => {
+            supabase
+                .from('mini_apps')
+                .select('*')
+                .eq('status', 'approved')
+                .then(({ data }) => {
+                    if (data) {
+                        const miniApps = data.map((app: any) => ({
+                            id: app.id,
+                            name: app.name,
+                            type: 'file' as const, // We use 'file' to distinguish from links, but we'll need to handle opening
+                            parentId: 'miniapps_folder',
+                            content: app.code, // Store code in content
+                            icon: app.icon || '📱'
+                        }));
+
+                        setFiles(prev => {
+                            // Ensure folder exists
+                            const folderExists = prev.find(f => f.id === 'miniapps_folder');
+                            const newFiles = folderExists ? prev : [
+                                ...prev, 
+                                { id: 'miniapps_folder', name: 'Mini Apps', type: 'folder' as const, parentId: 'desktop' }
+                            ];
+                            return [...newFiles, ...miniApps];
+                        });
+                    }
+                });
+        });
+
         import('../components/apps/AgentChat')
             .then(module => {
                 console.log("OSContext: AgentChat loaded");
                 const AgentChat = module.default;
                 
-                // Calculate Right Dock Position
-                const width = 400;
-                const height = window.innerHeight - 100;
-                const x = window.innerWidth - width - 20; // 20px padding from right
-                const y = 50;
+                // Left side, reduced height
+                const width = 450;
+                const height = 500;
+                const x = 50; 
+                const y = 80;
 
                 openWindow(
                     'Agent Chat',
@@ -352,6 +392,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
             });
 
         // Auto-open Announcement Terminal (Left Dock)
+        /* 
         import('../components/apps/AnnouncementApp')
             .then(module => {
                  const AnnouncementApp = module.default;
@@ -363,6 +404,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                      { x: (window.innerWidth / 2) - 175, y: 50 }
                  );
             });
+        */
     }
   }, []);
 
@@ -382,7 +424,12 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       moveFile,
       terminalCommand,
       setTerminalCommand,
-      executeTerminalCommand
+      executeTerminalCommand,
+      addMiniApp: (app: any) => {
+        // In a real app, this would probably fetch from DB or update local state
+        // For now, we utilize this to refresh the "Store" view if we had one in state
+        console.log("Mini App Added/Updated:", app);
+      }
     }}>
       {children}
     </OSContext.Provider>

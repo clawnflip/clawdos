@@ -76,13 +76,15 @@ const Desktop: React.FC = () => {
            <Logo className="w-1/3 h-1/3" showText={true} />
         </div>
         
-      {/* Desktop Icons Grid - Absolute positioning to allow free movement (simulated via drag) */}
-      <div className="absolute top-0 left-0 w-full h-[calc(100vh-var(--taskbar-height))] p-4 flex flex-col flex-wrap content-start gap-2 z-10 pointer-events-none">
-         <div className="flex flex-col flex-wrap h-full content-start gap-4 pointer-events-auto">
-            {desktopItems.map(item => (
-                <Icon key={item.id} item={item} />
-            ))}
-         </div>
+      {/* Desktop Icons Grid - Bottom Center Alignment */}
+      <div className="absolute top-0 left-0 w-full h-[calc(100vh-var(--taskbar-height))] p-4 pb-8 flex flex-col justify-end items-center z-10 pointer-events-none">
+            <div className="flex flex-row flex-wrap justify-center gap-6 pointer-events-auto max-w-[90%]">
+                {desktopItems.map(item => (
+                    <div key={item.id} className="pointer-events-auto">
+                        <Icon item={item} />
+                    </div>
+                ))}
+            </div>
       </div>
 
       {/* Selection Box */}
