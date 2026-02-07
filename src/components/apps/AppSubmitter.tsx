@@ -12,12 +12,7 @@ const AppSubmitter: React.FC = () => {
     const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
     const [msg, setMsg] = useState('');
 
-    const handlePreview = () => {
-         import('./MiniAppRunner').then(module => {
-             const MiniAppRunner = module.default;
-             alert("To preview, please copy code to Agent Chat and ask to 'run this code'.");
-         });
-    };
+
 
     const handleSubmit = async () => {
         if (!name || !code || !wallet || !twitter) {

@@ -146,6 +146,14 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       icon: 'https://pbs.twimg.com/profile_images/2018321879409307648/gqYF-un7_400x400.jpg'
     },
     {
+      id: 'base_posting',
+      name: 'Base Posting',
+      type: 'link',
+      parentId: 'desktop',
+      url: 'https://baseposting.com/',
+      icon: '/baseposting.jpg'
+    },
+    {
       id: 'clawdos_store',
       name: 'ClawdOS Store',
       type: 'link',

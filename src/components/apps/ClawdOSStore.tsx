@@ -124,20 +124,7 @@ const ClawdOSStore: React.FC = () => {
             >
                 <span className="text-lg">📤</span> Upload
             </button>
-            <button 
-                onClick={() => {
-                     import('./AppSubmitter').then(module => {
-                         const AppSubmitter = module.default;
-                         // using useOS hook context found in parent, but we need to pass openWindow or use context here
-                         // actually we can use window.dispatchEvent or just use the hook in this component
-                     });
-                     // Using the hook from line 17: const { createFile } = useOS();
-                     // We need openWindow.
-                }}
-                className="bg-green-600 hover:bg-green-500 text-white px-3 py-2 rounded-md ml-2 flex items-center gap-2 font-bold text-xs"
-            >
-                <span className="text-lg">📤</span> Upload
-            </button>
+
         </div>
       </div>
 
