@@ -1,4 +1,6 @@
 import React from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { getTranslation } from '../../i18n/translations';
 
 interface LogoProps {
   className?: string;
@@ -6,6 +8,8 @@ interface LogoProps {
 }
 
 const Logo: React.FC<LogoProps> = ({ className = "w-10 h-10", showText = true }) => {
+  const { language } = useLanguage();
+
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       {/* Icon */}
@@ -41,11 +45,17 @@ const Logo: React.FC<LogoProps> = ({ className = "w-10 h-10", showText = true })
       {/* Text */}
       {showText && (
           <div className="flex flex-col leading-none justify-center">
-            <span className="font-extrabold text-white tracking-widest text-lg font-sans">
-                CLAWD<span className="text-[var(--color-lobster-accent)]">OS</span>
-            </span>
+            {language === 'zh' ? (
+                 <span className="font-extrabold text-white tracking-widest text-lg font-sans">
+                    {getTranslation('logo.clawdos', language)}
+                </span>
+            ) : (
+                <span className="font-extrabold text-white tracking-widest text-lg font-sans">
+                    CLAWD<span className="text-[var(--color-lobster-accent)]">OS</span>
+                </span>
+            )}
             <span className="text-[0.5em] text-white/50 tracking-[0.3em] font-mono uppercase">
-                Intelligence
+                {getTranslation('logo.intelligence', language)}
             </span>
           </div>
       )}

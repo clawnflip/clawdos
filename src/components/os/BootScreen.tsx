@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { getTranslation } from '../../i18n/translations';
 
 const BootScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
+  const { language } = useLanguage();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -32,7 +35,7 @@ const BootScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
         >
             <div className="text-8xl animate-pulse">🦞</div>
             <div className="font-bold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-[var(--color-lobster-accent)]">
-                ClawdOS
+                {getTranslation('logo.clawdos', language)}
             </div>
         </motion.div>
 
@@ -43,7 +46,9 @@ const BootScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
             />
         </div>
         <div className="mt-2 text-xs text-gray-500 font-mono">
-            {progress < 100 ? `Loading System Resources... ${progress}%` : 'System Ready'}
+            {progress < 100 
+              ? `${getTranslation('boot.loading', language)} ${progress}%` 
+              : getTranslation('boot.ready', language)}
         </div>
     </motion.div>
   );

@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useOS } from '../../contexts/OSContext';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { getTranslation } from '../../i18n/translations';
 import { Send, User, Bot, Sparkles } from 'lucide-react';
 import Logo from '../os/Logo';
 import { fal } from "@fal-ai/client";
@@ -11,6 +13,7 @@ fal.config({ credentials: import.meta.env.VITE_FAL_KEY });
 
 const AgentChat: React.FC = () => {
   const { agent, setAgent, executeTerminalCommand, openWindow } = useOS();
+  const { language } = useLanguage();
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
 
@@ -25,14 +28,30 @@ const AgentChat: React.FC = () => {
         );
     });
   };
+  
+  const getInitialMessage = () => {
+      return agent.name 
+            ? `${getTranslation('agent.online', language)} ${agent.name}.` 
+            : `${getTranslation('agent.systemHalted', language)}\n\n${getTranslation('agent.provideInfo', language)}`;
+  };
+
   const [messages, setMessages] = useState<Array<{ sender: 'user' | 'agent', text: string }>>([
     { 
         sender: 'agent', 
-        text: agent.name 
-            ? `Online. Connected to ${agent.name}.` 
-            : `SYSTEM HALTED. Identity Verification Required.\n\nPlease provide your NAME and WALLET ADDRESS to initialize.` 
+        text: getInitialMessage()
     }
   ]);
+  
+  // Update initial message when language changes (only if it's the first and only message)
+  useEffect(() => {
+      if (messages.length === 1 && messages[0].sender === 'agent') {
+          setMessages([{
+              sender: 'agent',
+              text: getInitialMessage()
+          }]);
+      }
+  }, [language, agent.name]);
+
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

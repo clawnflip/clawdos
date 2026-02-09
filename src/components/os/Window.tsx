@@ -2,6 +2,8 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Square, Maximize2 } from 'lucide-react';
 import { useOS } from '../../contexts/OSContext';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { getTranslation } from '../../i18n/translations';
 
 interface WindowProps {
   id: string;
@@ -9,6 +11,7 @@ interface WindowProps {
 
 const Window: React.FC<WindowProps> = ({ id }) => {
   const { windows, closeWindow, minimizeWindow, maximizeWindow, focusWindow } = useOS();
+  const { language } = useLanguage();
   const windowState = windows.find(w => w.id === id);
 
   if (!windowState || !windowState.isOpen) return null;
@@ -54,18 +57,21 @@ const Window: React.FC<WindowProps> = ({ id }) => {
               <button 
                 onClick={(e) => { e.stopPropagation(); minimizeWindow(id); }}
                 className="p-1 hover:bg-white/10 rounded-full text-white transition-colors"
+                title={getTranslation('window.minimize', language)}
               >
                 <Minus size={14} />
               </button>
               <button 
                 onClick={(e) => { e.stopPropagation(); maximizeWindow(id); }}
                 className="p-1 hover:bg-white/10 rounded-full text-white transition-colors"
+                title={getTranslation('window.maximize', language)}
               >
                 {windowState.isMaximized ? <Square size={12} /> : <Maximize2 size={12} />}
               </button>
               <button 
                 onClick={(e) => { e.stopPropagation(); closeWindow(id); }}
                 className="p-1 hover:bg-red-500 rounded-full text-white transition-colors"
+                title={getTranslation('window.close', language)}
               >
                 <X size={14} />
               </button>

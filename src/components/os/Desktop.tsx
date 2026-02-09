@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useOS } from '../../contexts/OSContext';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { getTranslation } from '../../i18n/translations';
 import Icon from './Icon';
 import Logo from './Logo';
 import Window from './Window';
@@ -8,6 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 const Desktop: React.FC = () => {
   const { files, windows, createFile } = useOS();
+  const { language } = useLanguage();
   const [selectionBox, setSelectionBox] = useState<{ x: number, y: number, width: number, height: number } | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [startPos, setStartPos] = useState<{ x: number, y: number } | null>(null);
@@ -111,14 +114,14 @@ const Desktop: React.FC = () => {
                 style={{ left: contextMenu.x, top: contextMenu.y }}
             >
                 <button className="w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--color-lobster-accent)] hover:text-black transition-colors" onClick={handleCreateFolder}>
-                    New Folder
+                    {getTranslation('desktop.newFolder', language)}
                 </button>
                 <div className="h-[1px] bg-white/10 my-1" />
                 <button className="w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--color-lobster-accent)] hover:text-black transition-colors">
-                    Personalize
+                    {getTranslation('desktop.personalize', language)}
                 </button>
                 <button className="w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--color-lobster-accent)] hover:text-black transition-colors">
-                    Display Settings
+                    {getTranslation('desktop.displaySettings', language)}
                 </button>
             </motion.div>
         )}
