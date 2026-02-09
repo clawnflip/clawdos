@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useOS } from '../../contexts/OSContext';
+import { useState } from 'react';
 
 interface ClawdExcelProps {
     fileId?: string;
@@ -19,7 +18,6 @@ const generateGrid = (rows: number, cols: number) => {
 };
 
 const ClawdExcel: React.FC<ClawdExcelProps> = ({ fileId, initialContent }) => {
-  const { updateFile } = useOS();
   const [data, setData] = useState<string[][]>(() => {
       if (initialContent) {
           try {
@@ -32,15 +30,7 @@ const ClawdExcel: React.FC<ClawdExcelProps> = ({ fileId, initialContent }) => {
   });
   const [selectedCell, setSelectedCell] = useState<{r: number, c: number} | null>(null);
 
-  // Auto-save effect
-  useEffect(() => {
-    if (fileId) {
-        const timeout = setTimeout(() => {
-            updateFile(fileId, JSON.stringify(data));
-        }, 1000); // Debounce save
-        return () => clearTimeout(timeout);
-    }
-  }, [data, fileId, updateFile]);
+  // Auto-save removed (file system not implemented)
 
   const handleCellChange = (r: number, c: number, value: string) => {
       const newData = [...data];

@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useOS } from '../../contexts/OSContext';
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus, MonitorPlay } from 'lucide-react';
 
 interface ClawdPointProps {
@@ -8,7 +7,6 @@ interface ClawdPointProps {
 }
 
 const ClawdPoint: React.FC<ClawdPointProps> = ({ fileId, initialContent }) => {
-  const { updateFile } = useOS();
   const [slides, setSlides] = useState(() => {
      if (initialContent) {
          try {
@@ -28,15 +26,7 @@ const ClawdPoint: React.FC<ClawdPointProps> = ({ fileId, initialContent }) => {
 
   const activeSlide = slides[currentSlideIndex];
 
-  // Auto-save effect
-  useEffect(() => {
-    if (fileId) {
-        const timeout = setTimeout(() => {
-            updateFile(fileId, JSON.stringify(slides));
-        }, 1000); // Debounce save
-        return () => clearTimeout(timeout);
-    }
-  }, [slides, fileId, updateFile]);
+  // Auto-save removed (file system not implemented)
 
   const addSlide = () => {
       setSlides([...slides, { id: Date.now(), title: 'New Slide', content: 'Bullet points here...' }]);

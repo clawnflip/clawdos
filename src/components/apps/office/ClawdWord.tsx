@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useOS } from '../../contexts/OSContext';
+import { useState } from 'react';
 
 interface ClawdWordProps {
   fileId?: string;
@@ -8,19 +7,18 @@ interface ClawdWordProps {
 }
 
 const ClawdWord: React.FC<ClawdWordProps> = ({ fileId, initialContent = '', fileName: initialFileName = 'Untitled.txt' }) => {
-  const { updateFile } = useOS();
   const [content, setContent] = useState(initialContent || 'Welcome to ClawdWord!\n\nStart typing here...');
   const [fileName, setFileName] = useState(initialFileName);
 
-  // Auto-save effect
-  useEffect(() => {
-    if (fileId) {
-        const timeout = setTimeout(() => {
-            updateFile(fileId, content);
-        }, 1000); // Debounce save
-        return () => clearTimeout(timeout);
-    }
-  }, [content, fileId, updateFile]);
+  // Auto-save effect (placeholder - file system not implemented)
+  // useEffect(() => {
+  //   if (fileId) {
+  //       const timeout = setTimeout(() => {
+  //           // Save to file system
+  //       }, 1000);
+  //       return () => clearTimeout(timeout);
+  //   }
+  // }, [content, fileId]);
 
   return (
     <div className="flex flex-col h-full bg-white text-black font-sans">
