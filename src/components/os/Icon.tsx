@@ -23,6 +23,11 @@ const Icon: React.FC<IconProps> = ({ item }) => {
     if (item.name === 'Agent Chat') return <span className="text-5xl drop-shadow-md">💬</span>;
     if (item.name === 'Flappy Agent') return <span className="text-5xl drop-shadow-md">🦞</span>;
     if (item.name === 'My Computer') return <Anchor size={48} className="text-[var(--color-lobster-accent)]" />;
+    
+    // Office Icons
+    if (item.name === 'ClawdWord' || item.name.endsWith('.txt')) return <span>📝</span>;
+    if (item.name === 'ClawdExcel' || item.name.endsWith('.xlsx')) return <span>📊</span>;
+    if (item.name === 'ClawdPoint' || item.name.endsWith('.ppt')) return <span>📽️</span>;
 
     switch (item.type) {
       case 'folder': return <Folder size={48} className="text-yellow-400 drop-shadow-lg" fill="currentColor" />;
@@ -94,6 +99,46 @@ const Icon: React.FC<IconProps> = ({ item }) => {
                 <ClawdOSStore />,
                 <img src="/ClawdOStore.png" alt="Store" className="w-8 h-8" />,
                 { width: 900, height: 700 }
+            );
+        });
+        return;
+    }
+
+    // Office Apps
+    if (item.name === 'ClawdWord' || (item.name.endsWith('.txt') && item.type === 'file')) {
+        import('../apps/office/ClawdWord').then(module => {
+            const ClawdWord = module.default;
+            openWindow(
+                item.name,
+                <ClawdWord fileId={item.id} initialContent={item.content} fileName={item.name} />,
+                <span>📝</span>,
+                { width: 800, height: 600 }
+            );
+        });
+        return;
+    }
+
+    if (item.name === 'ClawdExcel' || (item.name.endsWith('.xlsx') && item.type === 'file')) {
+        import('../apps/office/ClawdExcel').then(module => {
+            const ClawdExcel = module.default;
+            openWindow(
+                item.name,
+                <ClawdExcel fileId={item.id} initialContent={item.content} />,
+                <span>📊</span>,
+                { width: 1000, height: 700 }
+            );
+        });
+        return;
+    }
+
+    if (item.name === 'ClawdPoint' || (item.name.endsWith('.ppt') && item.type === 'file')) {
+        import('../apps/office/ClawdPoint').then(module => {
+            const ClawdPoint = module.default;
+            openWindow(
+                item.name,
+                <ClawdPoint fileId={item.id} initialContent={item.content} />,
+                <span>📽️</span>,
+                { width: 900, height: 600 }
             );
         });
         return;

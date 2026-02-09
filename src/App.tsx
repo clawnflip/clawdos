@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { OSProvider } from './contexts/OSContext';
 import Desktop from './components/os/Desktop';
 import BootScreen from './components/os/BootScreen';
+import PodcastScreen from './components/apps/PodcastScreen';
 import { AnimatePresence } from 'framer-motion';
 
 function App() {
@@ -9,10 +10,13 @@ function App() {
 
   return (
     <OSProvider>
+      <PodcastScreen />
+      {/* 
       <AnimatePresence>
         {!booted && <BootScreen onComplete={() => setBooted(true)} />}
       </AnimatePresence>
-      {booted && <Desktop />}
+      {booted && <Desktop />} 
+      */}
     </OSProvider>
   );
 }

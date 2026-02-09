@@ -59,6 +59,7 @@ interface OSContextType {
   setTerminalCommand: (cmd: string | null) => void;
   executeTerminalCommand: (cmd: string) => void;
   addMiniApp: (app: any) => void;
+  updateFile: (fileId: string, content: string) => void;
 }
 
 const OSContext = createContext<OSContextType | undefined>(undefined);
@@ -173,6 +174,35 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       type: 'link',
       parentId: 'system_tools',
       icon: '📤'
+    },
+    
+    // Office Suite
+    {
+        id: 'office_folder',
+        name: 'Office',
+        type: 'folder',
+        parentId: 'desktop'
+    },
+    {
+        id: 'clawsword',
+        name: 'ClawdWord',
+        type: 'link',
+        parentId: 'office_folder',
+        icon: '📝'
+    },
+    {
+        id: 'clawsexcel',
+        name: 'ClawdExcel',
+        type: 'link',
+        parentId: 'office_folder',
+        icon: '📊'
+    },
+    {
+        id: 'clawdpoint',
+        name: 'ClawdPoint',
+        type: 'link',
+        parentId: 'office_folder',
+        icon: '📽️'
     },
     
     // Kept on Desktop
@@ -340,6 +370,99 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
     // We'll update TerminalApp.tsx to handle the 'Flappy Agent' title specifically.
   };
 
+  // Office Automation Test
+  useEffect(() => {
+      if (terminalCommand === 'test_office_automation') {
+          console.log("Running Office Automation Test...");
+          
+          const officeFolderId = files.find(f => f.id === 'office_folder')?.id || 'office_folder';
+
+          // 1. Create Word Doc
+          const docId = uuidv4();
+          const docContent = "CONFIDENTIAL AGENT REPORT\n\nSubject: Operation ClawdOS\n\nStatus: Systems nominal.\n\nEnd of Report.";
+          createFile("Agent Notes.txt", 'file', officeFolderId, docContent);
+          
+          // 2. Create Excel Sheet
+          const sheetId = uuidv4();
+          const sheetData = [
+              ["Metric", "Value", "Status"],
+              ["CPU", "45%", "OK"],
+              ["Memory", "1.2GB", "OK"],
+              ["Network", "12ms", "Excellent"]
+          ];
+          // Fill rest with empty strings to match grid size (optional, but good for display)
+          // Actually ClawsExcel handles partial data if grid generation logic is robust or if we pass full grid.
+          // Let's pass full grid for safety or update ClawsExcel to handle sparse.
+          // ClawsExcel expects string[][] of full 20x10.
+           const fullGrid: string[][] = [];
+            for (let i = 0; i < 20; i++) {
+                const row: string[] = [];
+                for (let j = 0; j < 10; j++) {
+                    if (i < sheetData.length && j < sheetData[i].length) {
+                        row.push(sheetData[i][j]);
+                    } else {
+                        row.push('');
+                    }
+                }
+                fullGrid.push(row);
+            }
+          createFile("Agent Data.xlsx", 'file', officeFolderId, JSON.stringify(fullGrid));
+
+          // 3. Create Presentation
+          const presId = uuidv4();
+          const presData = [
+              { id: 1, title: 'Project Lobster', content: 'Phase 1: Initiation' },
+              { id: 2, title: 'Roadmap', content: '- Build OS\n- Launch Token\n- World Domination' }
+          ];
+          createFile("Agent Plan.ppt", 'file', officeFolderId, JSON.stringify(presData));
+
+          // 4. Open them
+          setTimeout(() => {
+             // Open Word
+             import('../components/apps/office/ClawdWord').then(module => {
+                const ClawdWord = module.default;
+                openWindow(
+                    "Agent Notes.txt",
+                    <ClawdWord fileId={docId} initialContent={docContent} fileName="Agent Notes.txt" />,
+                    <span>📝</span>,
+                    { width: 600, height: 500 }
+                );
+             });
+             
+             // Open Excel
+             setTimeout(() => {
+                 import('../components/apps/office/ClawdExcel').then(module => {
+                    const ClawdExcel = module.default;
+                    openWindow(
+                        "Agent Data.xlsx",
+                        <ClawdExcel fileId={sheetId} initialContent={JSON.stringify(fullGrid)} />,
+                        <span>📊</span>,
+                        { width: 800, height: 600 },
+                        { x: 150, y: 100 }
+                    );
+                 });
+             }, 500);
+
+             // Open Point
+             setTimeout(() => {
+                 import('../components/apps/office/ClawdPoint').then(module => {
+                    const ClawdPoint = module.default;
+                    openWindow(
+                        "Agent Plan.ppt",
+                        <ClawdPoint fileId={presId} initialContent={JSON.stringify(presData)} />,
+                        <span>📽️</span>,
+                        { width: 800, height: 600 },
+                        { x: 200, y: 150 }
+                    );
+                 });
+             }, 1000);
+
+          }, 1000);
+          
+          setTerminalCommand(null); // Reset
+      }
+  }, [terminalCommand, files]);
+
   // Auto-open Agent Chat
   useEffect(() => {
     if (!initRef.current) {
@@ -437,6 +560,9 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
         // In a real app, this would probably fetch from DB or update local state
         // For now, we utilize this to refresh the "Store" view if we had one in state
         console.log("Mini App Added/Updated:", app);
+      },
+      updateFile: (fileId: string, content: string) => {
+        setFiles(prev => prev.map(f => f.id === fileId ? { ...f, content } : f));
       }
     }}>
       {children}

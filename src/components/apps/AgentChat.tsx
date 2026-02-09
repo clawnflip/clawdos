@@ -3,7 +3,7 @@ import { useOS } from '../../contexts/OSContext';
 import { Send, User, Bot, Sparkles } from 'lucide-react';
 import Logo from '../os/Logo';
 import { fal } from "@fal-ai/client";
-import { CLAW_OS_SYSTEM_PROMPT } from '../../utils/systemPrompt';
+import { CLAW_OS_SYSTEM_PROMPT, CLAW_OS_CHAT_PROMPT } from '../../utils/systemPrompt';
 
 // Configure fal with the proxy or client key
 // We use the exposed key for this demo.
@@ -86,6 +86,25 @@ const AgentChat: React.FC = () => {
          
          executeTerminalCommand(`play_flappy ${wallet}`);
          return;
+    }
+
+    // INTERCEPT: Test Office Agent
+    if (userMsg.toLowerCase() === 'test_office_agent') {
+        setMessages(prev => [...prev, { 
+            sender: 'agent', 
+            text: "Initializing Office Suite Test Protocol...\n\nCreating test files..." 
+        }]);
+
+        // Create files via OS Context command or direct manipulation
+        // Since we are in the component, we can use useOS() directly if we had exposed createFile
+        // But we didn't expose createFile in the hook usage here, let's check imports.
+        // trace: const { agent, setAgent, executeTerminalCommand, openWindow } = useOS();
+        // We need createFile!
+        
+        // Let's add createFile to destructuring
+        // We'll do this in a separate step or assume I'll fix the destructuring below.
+        executeTerminalCommand('test_office_automation');
+        return;
     }
 
     // INTERCEPT: Super Mario Demo
@@ -743,11 +762,17 @@ const AgentChat: React.FC = () => {
         ${userMsg}
         `;
 
+        // Determine which system prompt to use
+        const lowerInput = userMsg.toLowerCase();
+        const isCodingRequest = lowerInput.includes('mini app') || lowerInput.includes('kod yaz') || lowerInput.includes('write code') || lowerInput.includes('create app');
+        
+        const selectedSystemPrompt = isCodingRequest ? CLAW_OS_SYSTEM_PROMPT : CLAW_OS_CHAT_PROMPT;
+
         const stream = await fal.stream("openrouter/router", {
             input: {
                 prompt: contextPrompt,
                 model: "anthropic/claude-sonnet-4.5",
-                system_prompt: CLAW_OS_SYSTEM_PROMPT,
+                system_prompt: selectedSystemPrompt,
                 // @ts-ignore
                 messages: messages.map(m => ({ role: m.sender, content: m.text })),
                 reasoning: true 
