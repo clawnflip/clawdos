@@ -12,6 +12,10 @@ const Icon: React.FC<IconProps> = ({ item }) => {
   const { openWindow, moveFile } = useOS();
 
   const renderIconContent = () => {
+    // Check imageUrl first (for mini apps with preview images)
+    if (item.imageUrl && (item.imageUrl.startsWith('http') || item.imageUrl.startsWith('/'))) {
+        return <img src={item.imageUrl} alt={item.name} className="w-12 h-12 object-cover rounded-lg drop-shadow-md" />;
+    }
     // Check if icon is a URL (starts with http/https) or emoji
     if (item.icon && (item.icon.startsWith('http') || item.icon.startsWith('/'))) {
         return <img src={item.icon} alt={item.name} className="w-12 h-12 object-contain drop-shadow-md" />;
@@ -104,6 +108,32 @@ const Icon: React.FC<IconProps> = ({ item }) => {
         return;
     }
 
+    if (item.name === 'Developer Docs') {
+        import('../apps/ClawdOSDocs').then(module => {
+            const ClawdOSDocs = module.default;
+            openWindow(
+                'Developer Docs',
+                <ClawdOSDocs />,
+                <span>📖</span>,
+                { width: 950, height: 700 }
+            );
+        });
+        return;
+    }
+
+    if (item.name === 'Publish App') {
+        import('../apps/AppSubmitter').then(module => {
+            const AppSubmitter = module.default;
+            openWindow(
+                'Publish App',
+                <AppSubmitter />,
+                <span>📤</span>,
+                { width: 650, height: 750 }
+            );
+        });
+        return;
+    }
+
     // Office Apps
     if (item.name === 'ClawdWord' || (item.name.endsWith('.txt') && item.type === 'file')) {
         import('../apps/office/ClawdWord').then(module => {
@@ -160,15 +190,21 @@ const Icon: React.FC<IconProps> = ({ item }) => {
                 { width: 500, height: 400 }
             );
         });
-    } else if (item.type === 'file' && item.content) {
-        // Assume it's a mini app for now since we only use files for this
+    } else if (item.type === 'file' && (item.content || item.appUrl)) {
+        // Mini app: URL-based or code-based
         import('../apps/MiniAppRunner').then(module => {
             const MiniAppRunner = module.default;
+            const isUrl = item.appType === 'url' && !!item.appUrl;
             openWindow(
                 item.name,
-                <MiniAppRunner initialCode={item.content} appId={item.id} />,
-                <span>📱</span>,
-                { width: 400, height: 600 }
+                <MiniAppRunner
+                  initialCode={item.content}
+                  appId={item.id}
+                  appUrl={item.appUrl}
+                  appType={item.appType || 'code'}
+                />,
+                item.imageUrl ? <img src={item.imageUrl} className="w-4 h-4 rounded" /> : <span>📱</span>,
+                isUrl ? { width: 500, height: 700 } : { width: 400, height: 600 }
             );
         });
     }

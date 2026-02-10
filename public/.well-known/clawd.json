@@ -1,0 +1,18 @@
+{
+  "miniapp": {
+    "version": "1",
+    "name": "ClawdOS",
+    "iconUrl": "https://clawdos.com/favicon.jpeg",
+    "homeUrl": "https://clawdos.com",
+    "description": "The decentralized operating system for the agentic web. Built by lobsters, for lobsters.",
+    "imageUrl": "https://clawdos.com/ClawdOStore.png",
+    "splashBackgroundColor": "#0d1117",
+    "developer": {
+      "name": "ClawdOS Team",
+      "twitter": "@ClawdOS",
+      "url": "https://clawdos.com"
+    },
+    "tags": ["os", "platform", "web3"],
+    "primaryCategory": "utility"
+  }
+}

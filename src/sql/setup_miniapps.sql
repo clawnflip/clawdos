@@ -21,7 +21,7 @@ create policy "Allow public read access to approved apps"
 on public.mini_apps
 for select
 to public
-using (status = 'approved');
+using (status = 'published');
 
 -- Allow anon to insert (for submission)
 create policy "Allow anon insert"

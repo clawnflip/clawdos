@@ -23,9 +23,13 @@ export interface FileSystemItem {
   name: string;
   type: 'file' | 'folder' | 'link';
   parentId: string | null;
-  content?: string; // For text files
+  content?: string; // For text files / legacy code-based mini apps
   url?: string;     // For links/shortcuts
   icon?: string;    // Custom icon name
+  appUrl?: string;  // For URL-based mini apps
+  appType?: 'code' | 'url'; // Mini app type
+  imageUrl?: string; // Preview image
+  category?: string; // App category
 }
 
 export interface AgentState {
@@ -169,11 +173,11 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       icon: '📤'
     },
     {
-      id: 'app_submitter',
-      name: 'Publish App',
+      id: 'developer_docs',
+      name: 'Developer Docs',
       type: 'link',
-      parentId: 'system_tools',
-      icon: '📤'
+      parentId: 'desktop',
+      icon: '📖'
     },
     
     // Office Suite
@@ -474,16 +478,20 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
             supabase
                 .from('mini_apps')
                 .select('*')
-                .eq('status', 'approved')
+                .eq('status', 'published')
                 .then(({ data }) => {
                     if (data) {
                         const miniApps = data.map((app: any) => ({
                             id: app.id,
                             name: app.name,
-                            type: 'file' as const, // We use 'file' to distinguish from links, but we'll need to handle opening
+                            type: 'file' as const,
                             parentId: 'miniapps_folder',
-                            content: app.code, // Store code in content
-                            icon: app.icon || '📱'
+                            content: app.code,
+                            icon: app.icon || '📱',
+                            appUrl: app.app_url,
+                            appType: app.app_type || 'code',
+                            imageUrl: app.image_url,
+                            category: app.category,
                         }));
 
                         setFiles(prev => {
