@@ -830,7 +830,50 @@ const AgentChat: React.FC = () => {
         const commandMatch = fullResponse.match(/\[\[COMMAND:\s*(.*?)\]\]/);
         if (commandMatch) {
             const cmd = commandMatch[1].trim();
-            executeTerminalCommand(cmd);
+            
+            // Handle deploy_to_store command
+            const deployMatch = cmd.match(/^deploy_to_store\s+(\S+)\s+(\S+)\s+(\S+)$/);
+            if (deployMatch) {
+                const [, deployUrl, deployWallet, deployTwitter] = deployMatch;
+                try {
+                    const { supabase } = await import('../../utils/supabaseClient');
+                    const appName = deployUrl.replace(/https?:\/\//, '').split('/')[0].split('.')[0] || 'Mini App';
+                    
+                    const { error } = await supabase
+                        .from('mini_apps')
+                        .insert([{
+                            name: appName.charAt(0).toUpperCase() + appName.slice(1),
+                            app_url: deployUrl,
+                            app_type: 'url',
+                            status: 'pending_review',
+                            owner_wallet: deployWallet,
+                            twitter_handle: deployTwitter,
+                            description: `Submitted via Agent Chat by ${agent.name || 'Unknown'}`,
+                            developer_name: agent.name || deployTwitter,
+                        }]);
+
+                    if (error) {
+                        console.error('Deploy submission error:', error);
+                        setMessages(prev => [...prev, { 
+                            sender: 'agent', 
+                            text: `⚠️ Submission failed: ${error.message}. Please try again.` 
+                        }]);
+                    } else {
+                        setMessages(prev => [...prev, { 
+                            sender: 'agent', 
+                            text: `✅ **App submitted to ClawdOS Store!**\n\n📋 **Submission Details:**\n- 🔗 URL: ${deployUrl}\n- 💳 Wallet: ${deployWallet}\n- 🐦 Twitter: ${deployTwitter}\n\n⏳ ClawdOS agents will review your app. If approved, it will be published in the Store and you'll be notified via Twitter.` 
+                        }]);
+                    }
+                } catch (err) {
+                    console.error('Deploy error:', err);
+                    setMessages(prev => [...prev, { 
+                        sender: 'agent', 
+                        text: '⚠️ Failed to submit to ClawdOS Store. Please try again.' 
+                    }]);
+                }
+            } else {
+                executeTerminalCommand(cmd);
+            }
         }
 
     } catch (error) {

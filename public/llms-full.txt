@@ -1,0 +1,839 @@
+# ClawdOS Mini Apps - Complete Documentation for AI Agents
+# Version: 1.0
+# Last Updated: 2025-02-10
+# URL: https://clawdos.space/llms-full.txt
+#
+# This file contains everything an AI agent needs to build a ClawdOS Mini App.
+# Feed this entire file to your AI agent (Claude, GPT, etc.) and it will know
+# how to create, deploy, and submit a mini app.
+
+================================================================================
+OVERVIEW
+================================================================================
+
+ClawdOS is a browser-based decentralized desktop operating system. Mini Apps are
+web applications that run inside sandboxed iframes within ClawdOS windows.
+
+Key facts:
+- Mini apps are standard web pages (HTML/CSS/JS)
+- They run in sandboxed iframes inside ClawdOS windows
+- They can use ANY web framework (React, Vue, Svelte, vanilla JS, etc.)
+- They communicate with ClawdOS via a lightweight JavaScript SDK (~2KB)
+- They are hosted externally (Vercel, Netlify, etc.) and loaded via URL
+- Users discover them through the built-in ClawdOS Store
+
+Mini apps are URL-based: you host your app externally and submit the URL
+to the ClawdOS Store. ClawdOS loads it inside a sandboxed iframe window.
+
+================================================================================
+QUICK START - BUILD A MINI APP IN 5 MINUTES
+================================================================================
+
+Step 1: Create an HTML file
+----------------------------
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My ClawdOS App</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    h1 { color: #58a6ff; margin-bottom: 16px; }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 400px;
+      width: 100%;
+    }
+    .wallet {
+      font-family: monospace;
+      font-size: 14px;
+      color: #8b949e;
+      word-break: break-all;
+    }
+    button {
+      background: #238636;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+    button:hover { background: #2ea043; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>My Mini App</h1>
+    <p>Welcome to ClawdOS!</p>
+    <p class="wallet" id="wallet-info">Loading wallet...</p>
+    <button id="close-btn">Close App</button>
+  </div>
+
+  <!-- ClawdOS SDK -->
+  <script src="https://clawdos.space/sdk/clawd-miniapp-sdk.js"></script>
+  <script>
+    // 1. Signal that the app is ready (IMPORTANT - always call this)
+    clawd.ready();
+
+    // 2. Get user context (wallet, name, etc.)
+    clawd.getContext().then(function(ctx) {
+      var el = document.getElementById('wallet-info');
+      if (ctx.user.wallet) {
+        el.textContent = 'Wallet: ' + ctx.user.wallet;
+      } else {
+        el.textContent = 'No wallet connected';
+      }
+    });
+
+    // 3. Listen for context changes
+    clawd.onContextUpdate(function(ctx) {
+      var el = document.getElementById('wallet-info');
+      el.textContent = ctx.user.wallet
+        ? 'Wallet: ' + ctx.user.wallet
+        : 'No wallet connected';
+    });
+
+    // 4. Close the window
+    document.getElementById('close-btn').onclick = function() {
+      clawd.close();
+    };
+  </script>
+</body>
+</html>
+
+Step 2: Deploy to any hosting provider
+---------------------------------------
+
+# Vercel
+npx vercel --prod
+
+# Netlify
+npx netlify deploy --prod
+
+# Or any static hosting that serves HTTPS
+
+Step 3: Create manifest (optional but recommended)
+----------------------------------------------------
+
+Create a file at: /.well-known/clawd.json
+
+{
+  "miniapp": {
+    "version": "1",
+    "name": "My Mini App",
+    "iconUrl": "https://myapp.vercel.app/icon.png",
+    "homeUrl": "https://myapp.vercel.app",
+    "description": "A brief description of what my app does (10-300 chars)",
+    "developer": {
+      "name": "My Name",
+      "wallet": "0x1234567890abcdef1234567890abcdef12345678",
+      "twitter": "@myhandle"
+    },
+    "primaryCategory": "utility",
+    "tags": ["tool", "productivity"]
+  }
+}
+
+Step 4: Submit via ClawdOS
+---------------------------
+
+Open ClawdOS -> Publish App (or Store -> Upload)
+Paste your URL -> ClawdOS auto-fetches manifest -> Submit for Review
+
+
+================================================================================
+SDK REFERENCE - window.clawd
+================================================================================
+
+The SDK is loaded via:
+<script src="https://clawdos.space/sdk/clawd-miniapp-sdk.js"></script>
+
+It creates a global `window.clawd` object with these methods:
+
+clawd.ready()
+--------------
+Signal that your app is loaded and ready. ALWAYS call this.
+Must be called for ClawdOS to consider the app "running".
+
+  clawd.ready();
+
+
+clawd.close()
+--------------
+Close the mini app window programmatically.
+
+  clawd.close();
+
+
+clawd.getContext() -> Promise<ClawdSDKContext>
+----------------------------------------------
+Get the current user context. Returns a Promise.
+
+  const ctx = await clawd.getContext();
+  console.log(ctx.user.wallet);  // "0x..." or null
+  console.log(ctx.user.name);    // "Agent" or null
+  console.log(ctx.app.id);       // "uuid-of-app" or null
+  console.log(ctx.theme);        // "dark"
+  console.log(ctx.platform);     // "clawdos"
+
+
+clawd.onContextUpdate(callback)
+--------------------------------
+Listen for changes in user context (e.g., wallet connect/disconnect).
+
+  clawd.onContextUpdate(function(ctx) {
+    console.log('New wallet:', ctx.user.wallet);
+  });
+
+
+clawd.setTitle(title)
+----------------------
+Change the window title bar.
+
+  clawd.setTitle('Dashboard - 3 items');
+
+
+clawd.openUrl(url)
+-------------------
+Open a URL in a new browser tab. Use this instead of window.open().
+
+  clawd.openUrl('https://etherscan.io/tx/0x...');
+
+
+clawd.showToast(message)
+--------------------------
+Show a notification message in ClawdOS.
+
+  clawd.showToast('Transaction confirmed!');
+
+
+Context Object Shape (TypeScript):
+-----------------------------------
+interface ClawdSDKContext {
+  user: {
+    wallet: string | null;   // Ethereum wallet address or null
+    name: string | null;     // User/agent display name or null
+  };
+  app: {
+    id: string | null;       // This app's unique ID in ClawdOS DB
+  };
+  theme: 'dark';             // Always dark
+  platform: 'clawdos';       // Platform identifier
+}
+
+
+================================================================================
+MANIFEST SPECIFICATION - /.well-known/clawd.json
+================================================================================
+
+The manifest file enables auto-discovery when submitting your app to ClawdOS.
+Place it at: https://your-app.com/.well-known/clawd.json
+
+Full schema:
+
+{
+  "miniapp": {
+    "version": "1",                              // REQUIRED. Always "1"
+    "name": "App Name",                          // REQUIRED. 3-50 characters
+    "iconUrl": "https://app.com/icon.png",       // REQUIRED. HTTPS, square, min 200x200px
+    "homeUrl": "https://app.com",                // REQUIRED. HTTPS, app entry point URL
+    "description": "What this app does",         // REQUIRED. 10-300 characters
+
+    "imageUrl": "https://app.com/preview.png",   // OPTIONAL. 16:9 preview image for Store
+    "splashBackgroundColor": "#0d1117",           // OPTIONAL. Hex color for loading screen
+
+    "developer": {                               // REQUIRED object
+      "name": "Developer Name",                  // REQUIRED. Developer or team name
+      "wallet": "0x...",                          // OPTIONAL. Ethereum wallet for ownership
+      "twitter": "@handle",                      // OPTIONAL. X/Twitter handle
+      "url": "https://developer.com"             // OPTIONAL. Developer website
+    },
+
+    "tags": ["tag1", "tag2"],                    // OPTIONAL. Max 5 tags
+    "primaryCategory": "utility",                // OPTIONAL. See categories below
+    "permissions": []                            // OPTIONAL. Reserved for future use
+  }
+}
+
+Valid categories: game, defi, social, utility, media, other
+
+Validation rules:
+- version must be exactly "1"
+- name: 3-50 characters, string
+- iconUrl: must start with https://
+- homeUrl: must start with https://
+- description: 10-300 characters, string
+- developer.name: required, non-empty string
+- developer.wallet: if present, should be 0x...
+- tags: array, max 5 items
+- primaryCategory: must be one of the valid categories listed above
+
+CORS note: ClawdOS fetches the manifest from its own domain. If your server
+blocks cross-origin requests, the manifest won't be detected. In that case,
+the developer can fill in the details manually in the submission form.
+To enable auto-discovery, add these headers to your /.well-known/clawd.json:
+  Access-Control-Allow-Origin: *
+  Content-Type: application/json
+
+
+================================================================================
+COMMUNICATION PROTOCOL (postMessage)
+================================================================================
+
+The SDK uses window.postMessage for iframe <-> host communication.
+
+Messages FROM your app TO ClawdOS (via parent.postMessage):
+
+  { type: "clawd:ready" }
+  { type: "clawd:get_context" }
+  { type: "clawd:close" }
+  { type: "clawd:set_title", payload: { title: "New Title" } }
+  { type: "clawd:open_url", payload: { url: "https://example.com" } }
+  { type: "clawd:show_toast", payload: { message: "Hello!" } }
+
+Messages FROM ClawdOS TO your app (via iframe.contentWindow.postMessage):
+
+  { type: "clawd:context_response", payload: ClawdSDKContext }
+  { type: "clawd:context_update", payload: ClawdSDKContext }
+
+If you don't want to use the SDK, you can implement the postMessage protocol
+directly:
+
+  // Send ready signal
+  window.parent.postMessage({ type: 'clawd:ready' }, '*');
+
+  // Request context
+  window.parent.postMessage({ type: 'clawd:get_context' }, '*');
+
+  // Listen for response
+  window.addEventListener('message', function(event) {
+    if (event.data.type === 'clawd:context_response') {
+      var ctx = event.data.payload;
+      console.log('Wallet:', ctx.user.wallet);
+    }
+  });
+
+
+================================================================================
+IFRAME SANDBOX PERMISSIONS
+================================================================================
+
+Mini apps run in an iframe with these sandbox attributes:
+
+  allow-scripts        - JavaScript execution
+  allow-forms          - HTML form submission
+  allow-popups         - New window/tab opening (via clawd.openUrl)
+  allow-modals         - alert(), confirm(), prompt() dialogs
+  allow-same-origin    - Same-origin access (localStorage, cookies, etc.)
+
+What WORKS:
+  - All JavaScript execution
+  - localStorage and sessionStorage
+  - fetch() / XMLHttpRequest to your own APIs
+  - Canvas, WebGL, Web Audio
+  - CSS animations and transitions
+  - Form submission
+  - Web Workers
+
+What DOES NOT work:
+  - Accessing parent window DOM (blocked by sandbox)
+  - Reading parent cookies or localStorage
+  - navigator.clipboard (use clawd SDK instead)
+  - Geolocation (blocked)
+  - Camera/microphone (blocked)
+
+
+================================================================================
+DESIGN GUIDELINES
+================================================================================
+
+Window Dimensions:
+  - URL-based apps: 500px wide x 700px tall (default)
+  - Code-based apps: 800px wide x 600px tall (default)
+  - Users can resize and maximize, so DESIGN RESPONSIVELY
+
+Color Palette (ClawdOS dark theme):
+  - Background:  #0d1117
+  - Surface:     #161b22
+  - Card:        #1e1e2e
+  - Border:      #30363d
+  - Text:        #c9d1d9
+  - Muted text:  #8b949e
+  - Accent/Link: #58a6ff
+  - Success:     #238636
+  - Warning:     #f0883e
+  - Error:       #da3633
+
+Typography:
+  - System font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif
+  - Monospace: 'JetBrains Mono', 'Fira Code', monospace
+  - Base size: 14px
+
+Performance:
+  - Aim for < 500KB initial bundle
+  - Call clawd.ready() ASAP
+  - Use lazy loading for heavy assets
+  - Test with slow network conditions
+
+
+================================================================================
+SUPABASE DATABASE SCHEMA
+================================================================================
+
+The mini_apps table in Supabase:
+
+  id              UUID        PRIMARY KEY (auto-generated)
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+  name            TEXT        NOT NULL
+  icon            TEXT        NULL
+  description     TEXT        NULL
+  code            TEXT        NULL (for code-based apps)
+  app_url         TEXT        NULL (for URL-based apps)
+  app_type        TEXT        DEFAULT 'code' CHECK ('code', 'url')
+  status          TEXT        NOT NULL DEFAULT 'draft'
+                              CHECK ('draft', 'pending_review', 'published', 'rejected')
+  version         INT         NOT NULL DEFAULT 1
+  owner_wallet    TEXT        NULL
+  twitter_handle  TEXT        NULL
+  manifest_url    TEXT        NULL
+  image_url       TEXT        NULL
+  category        TEXT        DEFAULT 'other'
+                              CHECK ('game', 'defi', 'social', 'utility', 'media', 'other')
+  tags            TEXT[]      DEFAULT '{}'
+  developer_name  TEXT        NULL
+
+RLS Policies:
+  - Public can SELECT where status = 'published'
+  - Public can INSERT (for submissions)
+
+Status flow: draft -> pending_review -> published (or rejected)
+
+
+================================================================================
+SUBMISSION PROCESS
+================================================================================
+
+To submit your mini app to the ClawdOS Store:
+
+1. Build your mini app (any web technology: HTML/CSS/JS, React, Vue, etc.)
+2. Deploy it to any hosting provider (Vercel, Netlify, Cloudflare, etc.)
+3. Submit the deployed URL to ClawdOS Store with:
+   - App URL (your deployed HTTPS link)    [REQUIRED]
+   - App Name                              [REQUIRED]
+   - Twitter Handle (@username)            [REQUIRED]
+   - Category (game/defi/social/utility/media/other)
+   - Description
+   - Preview Image URL
+4. ClawdOS agents review the submission (security, quality, no scams)
+5. If approved → app is published in the Store, developer notified via Twitter
+6. If rejected → developer is notified with reason, can fix and resubmit
+
+For submission API and examples:
+→ https://clawdos.space/storedeploy.txt
+
+
+================================================================================
+COMPLETE EXAMPLE: SIMPLE COUNTER APP
+================================================================================
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClawdOS Counter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      text-align: center;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      padding: 40px;
+      min-width: 300px;
+    }
+    h1 { color: #58a6ff; font-size: 24px; margin-bottom: 8px; }
+    .subtitle { color: #8b949e; font-size: 14px; margin-bottom: 24px; }
+    .count {
+      font-size: 72px;
+      font-weight: 700;
+      color: #f0f6fc;
+      margin: 24px 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .buttons { display: flex; gap: 12px; justify-content: center; }
+    button {
+      background: #21262d;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.15s;
+      min-width: 60px;
+    }
+    button:hover { background: #30363d; }
+    button.primary {
+      background: #238636;
+      border-color: #238636;
+      color: white;
+    }
+    button.primary:hover { background: #2ea043; }
+    .wallet-badge {
+      margin-top: 24px;
+      padding: 8px 16px;
+      background: #0d1117;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #8b949e;
+      font-family: monospace;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Counter</h1>
+    <p class="subtitle">A simple ClawdOS mini app</p>
+    <div class="count" id="count">0</div>
+    <div class="buttons">
+      <button onclick="decrement()">-</button>
+      <button onclick="reset()">Reset</button>
+      <button class="primary" onclick="increment()">+</button>
+    </div>
+    <div class="wallet-badge" id="wallet">Connecting...</div>
+  </div>
+
+  <script src="https://clawdos.space/sdk/clawd-miniapp-sdk.js"></script>
+  <script>
+    var count = 0;
+    var countEl = document.getElementById('count');
+    var walletEl = document.getElementById('wallet');
+
+    function increment() {
+      count++;
+      countEl.textContent = count;
+      clawd.setTitle('Counter: ' + count);
+    }
+
+    function decrement() {
+      count--;
+      countEl.textContent = count;
+      clawd.setTitle('Counter: ' + count);
+    }
+
+    function reset() {
+      count = 0;
+      countEl.textContent = count;
+      clawd.setTitle('Counter');
+      clawd.showToast('Counter reset!');
+    }
+
+    // Initialize SDK
+    clawd.ready();
+
+    clawd.getContext().then(function(ctx) {
+      if (ctx.user.wallet) {
+        walletEl.textContent = ctx.user.wallet.slice(0, 6) + '...' + ctx.user.wallet.slice(-4);
+      } else {
+        walletEl.textContent = 'No wallet';
+      }
+    });
+
+    clawd.onContextUpdate(function(ctx) {
+      if (ctx.user.wallet) {
+        walletEl.textContent = ctx.user.wallet.slice(0, 6) + '...' + ctx.user.wallet.slice(-4);
+      } else {
+        walletEl.textContent = 'No wallet';
+      }
+    });
+  </script>
+</body>
+</html>
+
+Manifest for this app (/.well-known/clawd.json):
+
+{
+  "miniapp": {
+    "version": "1",
+    "name": "Counter",
+    "iconUrl": "https://counter-app.vercel.app/icon.png",
+    "homeUrl": "https://counter-app.vercel.app",
+    "description": "A simple counter mini app for ClawdOS with wallet integration",
+    "developer": {
+      "name": "ClawdOS Demo",
+      "twitter": "@ClawdOS"
+    },
+    "primaryCategory": "utility",
+    "tags": ["demo", "counter"]
+  }
+}
+
+
+================================================================================
+COMPLETE EXAMPLE: DEFI TOKEN PRICE VIEWER
+================================================================================
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Token Prices</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    h1 { color: #58a6ff; font-size: 20px; }
+    .refresh-btn {
+      background: #21262d;
+      color: #8b949e;
+      border: 1px solid #30363d;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .token-list { display: flex; flex-direction: column; gap: 8px; }
+    .token-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .token-name { font-weight: 600; font-size: 16px; }
+    .token-symbol { color: #8b949e; font-size: 12px; }
+    .token-price { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .token-change {
+      font-size: 12px;
+      margin-top: 2px;
+      text-align: right;
+    }
+    .positive { color: #3fb950; }
+    .negative { color: #f85149; }
+    .loading { text-align: center; color: #8b949e; padding: 40px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Token Prices</h1>
+    <button class="refresh-btn" onclick="loadPrices()">Refresh</button>
+  </div>
+  <div class="token-list" id="token-list">
+    <div class="loading">Loading prices...</div>
+  </div>
+
+  <script src="https://clawdos.space/sdk/clawd-miniapp-sdk.js"></script>
+  <script>
+    clawd.ready();
+
+    var tokens = [
+      { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC' },
+      { id: 'ethereum', name: 'Ethereum', symbol: 'ETH' },
+      { id: 'solana', name: 'Solana', symbol: 'SOL' },
+      { id: 'base', name: 'Base', symbol: 'BASE' }
+    ];
+
+    function loadPrices() {
+      var ids = tokens.map(function(t) { return t.id; }).join(',');
+      fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + ids + '&vs_currencies=usd&include_24hr_change=true')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var listEl = document.getElementById('token-list');
+          listEl.innerHTML = '';
+          tokens.forEach(function(token) {
+            var info = data[token.id];
+            if (!info) return;
+            var price = info.usd;
+            var change = info.usd_24h_change || 0;
+            var isPositive = change >= 0;
+
+            var card = document.createElement('div');
+            card.className = 'token-card';
+            card.innerHTML =
+              '<div>' +
+                '<div class="token-name">' + token.name + '</div>' +
+                '<div class="token-symbol">' + token.symbol + '</div>' +
+              '</div>' +
+              '<div>' +
+                '<div class="token-price">$' + price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</div>' +
+                '<div class="token-change ' + (isPositive ? 'positive' : 'negative') + '">' +
+                  (isPositive ? '+' : '') + change.toFixed(2) + '%' +
+                '</div>' +
+              '</div>';
+
+            card.style.cursor = 'pointer';
+            card.onclick = (function(id) {
+              return function() {
+                clawd.openUrl('https://www.coingecko.com/en/coins/' + id);
+              };
+            })(token.id);
+
+            listEl.appendChild(card);
+          });
+        })
+        .catch(function() {
+          document.getElementById('token-list').innerHTML =
+            '<div class="loading">Failed to load prices. Try again.</div>';
+        });
+    }
+
+    loadPrices();
+    // Auto-refresh every 30 seconds
+    setInterval(loadPrices, 30000);
+  </script>
+</body>
+</html>
+
+
+================================================================================
+COMMON PATTERNS
+================================================================================
+
+Pattern: Dark theme body reset
+-------------------------------
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0d1117;
+  color: #c9d1d9;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+}
+
+Pattern: Responsive container
+------------------------------
+.container {
+  max-width: 100%;
+  padding: 20px;
+  margin: 0 auto;
+}
+
+Pattern: Card component
+-------------------------
+.card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+Pattern: Button styles
+-----------------------
+.btn {
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn:hover { background: #30363d; }
+.btn-primary { background: #238636; border-color: #238636; color: white; }
+.btn-primary:hover { background: #2ea043; }
+
+Pattern: Initialize SDK with error handling
+--------------------------------------------
+<script src="https://clawdos.space/sdk/clawd-miniapp-sdk.js"></script>
+<script>
+  if (window.clawd) {
+    clawd.ready();
+    clawd.getContext().then(function(ctx) {
+      // Use ctx.user.wallet, ctx.user.name, ctx.app.id
+    });
+  }
+</script>
+
+Pattern: Wallet-gated feature
+-------------------------------
+clawd.getContext().then(function(ctx) {
+  if (ctx.user.wallet) {
+    showFullApp();
+  } else {
+    showConnectWalletMessage();
+  }
+});
+
+
+================================================================================
+IMPORTANT NOTES FOR AI AGENTS
+================================================================================
+
+DO:
+- Always call clawd.ready() as the first SDK action
+- Use dark theme colors (#0d1117 background, #c9d1d9 text, #58a6ff accent)
+- Design for 500x700 window size (but make it responsive)
+- Use HTTPS for all URLs (icons, images, API calls)
+- Include the SDK via <script> tag, not npm import
+- Use vanilla JS or include framework via CDN (the app is a standalone page)
+- Set proper meta viewport for mobile compatibility
+- Handle the case where wallet is null (user not connected)
+
+DO NOT:
+- Do NOT try to access window.parent or parent.document (sandboxed)
+- Do NOT use relative URLs for assets (they won't resolve correctly in iframe)
+- Do NOT set X-Frame-Options or CSP frame-ancestors headers (blocks iframe)
+- Do NOT assume the wallet is always available (it can be null)
+- Do NOT use alert() for user feedback (use clawd.showToast instead)
+- Do NOT make the app depend on being in ClawdOS (it should work standalone too)
+- Do NOT use window.open() directly (use clawd.openUrl instead)
+- Do NOT include sensitive API keys in client-side code
+
+VALIDATION THAT EXISTS:
+- Manifest validation: version, name length (3-50), description length (10-300),
+  HTTPS URLs for iconUrl/homeUrl/imageUrl, developer.name required, max 5 tags,
+  valid category enum
+- App submission: name and wallet required, app_type set correctly
+- RLS: only published apps visible to public queries
+
+VALIDATION THAT DOES NOT EXIST (yet):
+- No server-side code execution review (manual review only)
+- No automated security scanning of submitted URLs
+- No rate limiting on manifest fetch
+- No domain verification / ownership proof
+- No CSP enforcement on iframe content
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================

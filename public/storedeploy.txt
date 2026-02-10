@@ -1,0 +1,234 @@
+---
+name: clawdos-store
+version: 1.0.0
+description: Submit your mini app to the ClawdOS Store for review and publication.
+homepage: https://clawdos.space
+metadata: {"clawdos":{"category":"platform","api_base":"https://clawdos.space/v1"}}
+---
+
+# ClawdOS Store: Mini App Submission Guide
+
+Submit your mini app to ClawdOS — a browser-based decentralized operating system
+with a built-in app marketplace.
+
+> **v1.0.0** — Feed this file to your AI agent to submit a deployed mini app.
+
+---
+
+## What is ClawdOS?
+
+ClawdOS is an AI-powered operating system that runs in the browser. It features
+a desktop environment, agents, and a **Store** where mini apps are published.
+
+Mini apps are standard web pages that run inside ClawdOS windows (iframes).
+Anyone can build a mini app, deploy it to any hosting provider, and submit
+the URL to the ClawdOS Store.
+
+---
+
+## How It Works
+
+```
+1. Build your mini app       → Any web app (HTML/CSS/JS, React, Vue, etc.)
+2. Deploy to hosting         → Vercel, Netlify, Cloudflare, or any HTTPS host
+3. Submit to ClawdOS Store   → Send us your URL + info
+4. Review                    → ClawdOS agents review for quality & security
+5. Published!                → Your app goes live in the Store
+```
+
+---
+
+## Submit Your App
+
+To submit your mini app to the ClawdOS Store, send a **POST** request:
+
+```
+POST https://clawdos.space/v1/store/submit
+Content-Type: application/json
+```
+
+### Required Fields
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `app_url` | string | Your deployed app's HTTPS URL | `"https://myapp.vercel.app"` |
+| `name` | string | App name (3-50 characters) | `"Token Dashboard"` |
+| `twitter_handle` | string | Your X/Twitter handle | `"@myhandle"` |
+
+### Optional Fields
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `description` | string | What the app does (10-300 chars) | `"Track crypto prices"` |
+| `category` | string | App category | `"defi"` |
+| `image_url` | string | Preview screenshot URL (16:9) | `"https://myapp.vercel.app/preview.png"` |
+| `icon` | string | App icon URL or emoji | `"🚀"` or URL |
+| `wallet` | string | Your Ethereum wallet (0x...) | `"0x1234...abcd"` |
+| `developer_name` | string | Your name / team name | `"My Team"` |
+| `tags` | array | Up to 5 tags | `["defi", "tokens"]` |
+
+### Categories
+
+`game` · `defi` · `social` · `utility` · `media` · `other`
+
+---
+
+## Examples
+
+### Minimal submission (3 fields):
+
+```bash
+curl -X POST https://clawdos.space/v1/store/submit \
+  -H "Content-Type: application/json" \
+  -d '{
+    "app_url": "https://my-defi-app.vercel.app",
+    "name": "DeFi Dashboard",
+    "twitter_handle": "@defi_builder"
+  }'
+```
+
+### Full submission:
+
+```bash
+curl -X POST https://clawdos.space/v1/store/submit \
+  -H "Content-Type: application/json" \
+  -d '{
+    "app_url": "https://my-defi-app.vercel.app",
+    "name": "DeFi Dashboard",
+    "twitter_handle": "@defi_builder",
+    "description": "Real-time token prices with portfolio tracking",
+    "category": "defi",
+    "image_url": "https://my-defi-app.vercel.app/og-image.png",
+    "icon": "📊",
+    "wallet": "0xABCD1234567890ABCDEF1234567890ABCDEF1234",
+    "developer_name": "DeFi Builder Team",
+    "tags": ["defi", "tokens", "dashboard"]
+  }'
+```
+
+### Python:
+
+```python
+import requests
+
+response = requests.post('https://clawdos.space/v1/store/submit', json={
+    'app_url': 'https://my-app.vercel.app',
+    'name': 'My Mini App',
+    'twitter_handle': '@myhandle',
+    'category': 'utility',
+    'description': 'A useful tool for ClawdOS users'
+})
+
+print(response.json())
+```
+
+### JavaScript:
+
+```javascript
+const res = await fetch('https://clawdos.space/v1/store/submit', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    app_url: 'https://my-app.vercel.app',
+    name: 'My Mini App',
+    twitter_handle: '@myhandle',
+    category: 'utility',
+    description: 'A useful tool for ClawdOS users'
+  })
+});
+console.log(await res.json());
+```
+
+---
+
+## Building Your Mini App
+
+Your app is just a normal web page. Use whatever stack you want:
+HTML/CSS/JS, React, Vue, Svelte — anything that produces a web page.
+
+### Requirements
+
+- **HTTPS URL** — Must be served over HTTPS
+- **No auth wall** — App should load without login (ClawdOS provides wallet context)
+- **Responsive** — Default ClawdOS window is 500×700px, but users can resize
+
+### ClawdOS SDK (Optional)
+
+Add the ClawdOS SDK to access the user's wallet and OS features:
+
+```html
+<script src="https://clawdos.space/sdk/clawd-miniapp-sdk.js"></script>
+<script>
+  // Tell ClawdOS your app is ready
+  clawd.ready();
+
+  // Get user's wallet
+  clawd.getContext().then(ctx => {
+    console.log('Wallet:', ctx.user.wallet);
+  });
+</script>
+```
+
+**SDK Methods:**
+
+| Method | Description |
+|--------|-------------|
+| `clawd.ready()` | Signal app is loaded |
+| `clawd.getContext()` | Get user wallet & context |
+| `clawd.setTitle(title)` | Change window title |
+| `clawd.openUrl(url)` | Open URL in new tab |
+| `clawd.showToast(msg)` | Show notification |
+| `clawd.close()` | Close the window |
+
+### Design Tips
+
+ClawdOS uses a dark theme. Recommended colors:
+- Background: `#0d1117`
+- Surface: `#161b22`
+- Text: `#c9d1d9`
+- Accent: `#58a6ff`
+
+For full SDK documentation: https://clawdos.space/llms-full.txt
+
+---
+
+## Review Process
+
+| Step | Status | What Happens |
+|------|--------|-------------|
+| 1 | `pending_review` | Your app is in the review queue |
+| 2 | Under review | ClawdOS agents check quality & security |
+| 3a | `published` | App goes live in the Store! You're notified via Twitter |
+| 3b | `rejected` | You're notified with the reason. Fix and resubmit |
+
+### What we check:
+- ✅ App loads at the URL
+- ✅ No scams, phishing, or malicious content
+- ✅ Reasonable quality (not broken/empty)
+- ✅ Description matches functionality
+- ❌ No fake token schemes
+- ❌ No data-stealing attempts
+
+### After approval:
+- Your app appears in the ClawdOS Store "Browse" tab
+- Users can install and open it from their desktop
+- Published apps may be prioritized for tokenization
+
+---
+
+## After Submission
+
+Tell your user:
+
+> "Your mini app **[name]** has been submitted to the ClawdOS Store! 🎉
+>
+> - 🔗 URL: [app_url]
+> - 🐦 Twitter: [twitter_handle]
+>
+> ClawdOS agents will review it within 24-48 hours.
+> You'll be notified via Twitter when it's approved."
+
+---
+
+> **Submission guide:** `https://clawdos.space/storedeploy.txt` | v1.0.0
+> **Full SDK docs:** `https://clawdos.space/llms-full.txt`

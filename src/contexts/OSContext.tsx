@@ -154,7 +154,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       id: 'base_posting',
       name: 'Base Posting',
       type: 'link',
-      parentId: 'desktop',
+      parentId: 'system_tools',
       url: 'https://baseposting.com/',
       icon: '/baseposting.jpg'
     },
@@ -165,27 +165,21 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       parentId: 'desktop',
       icon: '/ClawdOStore.png'
     },
-    {
-      id: 'app_submitter',
-      name: 'Publish App',
-      type: 'link',
-      parentId: 'system_tools',
-      icon: '📤'
-    },
+    // Removed App Submitter
     {
       id: 'developer_docs',
       name: 'Developer Docs',
       type: 'link',
-      parentId: 'desktop',
+      parentId: 'system_tools',
       icon: '📖'
     },
     
-    // Office Suite
+    // Office Suite - Move to System Tools
     {
         id: 'office_folder',
         name: 'Office',
         type: 'folder',
-        parentId: 'desktop'
+        parentId: 'system_tools'
     },
     {
         id: 'clawsword',
@@ -216,7 +210,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       type: 'link', 
       parentId: 'desktop', 
       url: 'https://clawn.ch',
-      icon: '🚀' // Keeping emoji as no image URL was found in history, checks welcome
+      icon: '🚀'
     },
     { 
       id: '3', 
@@ -234,11 +228,12 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       url: 'https://moltbook.com',
       icon: 'https://www.moltbook.com/_next/image?url=%2Fmoltbook-mascot.png&w=128&q=75&dpl=dpl_G1nLqkt5jcHU3bXaKb5Ccfuw8FFq'
     },
+    // Moved to System Tools
     { 
       id: '6', 
       name: 'MoltChess', 
       type: 'link', 
-      parentId: 'desktop', 
+      parentId: 'system_tools', 
       url: 'https://moltchess.com', 
       icon: 'https://molt-chess.vercel.app/logo.png'
     },
@@ -246,7 +241,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       id: '7', 
       name: 'Bankr', 
       type: 'link', 
-      parentId: 'desktop', 
+      parentId: 'system_tools', 
       url: 'https://bankr.finance',
       icon: 'https://pbs.twimg.com/profile_images/1951545493936545792/AriqgxQN_400x400.jpg'
     },
@@ -254,7 +249,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       id: 'clawdict', 
       name: 'Clawdict', 
       type: 'link', 
-      parentId: 'desktop', 
+      parentId: 'system_tools', 
       url: 'https://clawdict.com',
       icon: 'https://pbs.twimg.com/profile_images/2017657129927139328/7FXsrH3v_400x400.jpg'
     },
@@ -262,7 +257,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       id: 'cmc', 
       name: 'Clawnch Market Cap', 
       type: 'link', 
-      parentId: 'desktop', 
+      parentId: 'system_tools', 
       url: 'https://clawnchmarketcap.com',
       icon: 'https://clawnchmarketcap.com/assets/logo-icon-Dx_mHtr0.png'
     },
@@ -270,7 +265,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       id: 'ans', 
       name: 'ANS', 
       type: 'link', 
-      parentId: 'desktop', 
+      parentId: 'system_tools', 
       url: 'https://a-n-s.space',
       icon: 'https://a-n-s.space/logo.svg'
     },
@@ -507,6 +502,8 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                 });
         });
 
+        // Agent Chat auto-open disabled per user request
+        /*
         import('../components/apps/AgentChat')
             .then(module => {
                 console.log("OSContext: AgentChat loaded");
@@ -528,6 +525,26 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
             })
             .catch(err => {
                 console.error("OSContext: Failed to load AgentChat", err);
+            });
+        */
+
+        // Auto-open ClawdOS Store
+        import('../components/apps/ClawdOSStore')
+            .then(module => {
+                const ClawdOSStore = module.default;
+                const width = 800;
+                const height = 600;
+                // Center of remaining space or just center screen
+                const x = Math.max(520, (window.innerWidth - width) / 2 + 200); 
+                const y = 80;
+
+                openWindow(
+                    'ClawdOS Store',
+                    <ClawdOSStore />,
+                    <span>🛒</span>, // Updated icon to shopping cart/store
+                    { width, height },
+                    { x, y }
+                );
             });
 
         // Auto-open Announcement Terminal (Left Dock)

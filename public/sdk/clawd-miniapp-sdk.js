@@ -3,7 +3,7 @@
  * Lightweight SDK for building ClawdOS mini applications.
  *
  * Usage:
- *   <script src="https://clawdos.com/sdk/clawd-miniapp-sdk.js"></script>
+ *   <script src="https://clawdos.space/sdk/clawd-miniapp-sdk.js"></script>
  *   <script>
  *     clawd.ready();
  *     const ctx = await clawd.getContext();

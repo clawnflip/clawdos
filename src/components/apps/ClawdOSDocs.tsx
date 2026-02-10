@@ -192,7 +192,7 @@ const GettingStartedSection = () => (
     <p id="wallet">Connecting...</p>
   </div>
 
-  <script src="https://clawdos.com/sdk/clawd-miniapp-sdk.js"></script>
+  <script src="https://clawdos.space/sdk/clawd-miniapp-sdk.js"></script>
   <script>
     // Signal that the app is ready
     clawd.ready();
@@ -360,7 +360,7 @@ const SDKSection = () => (
 
     <H2>Installation</H2>
     <P>Add the SDK via script tag in your HTML:</P>
-    <CodeBlock lang="html">{`<script src="https://clawdos.com/sdk/clawd-miniapp-sdk.js"></script>`}</CodeBlock>
+    <CodeBlock lang="html">{`<script src="https://clawdos.space/sdk/clawd-miniapp-sdk.js"></script>`}</CodeBlock>
     <P>The SDK exposes a global <InlineCode>window.clawd</InlineCode> object.</P>
 
     <H2>API</H2>
