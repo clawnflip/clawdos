@@ -81,12 +81,21 @@ Current User: ${agent.name || 'GUEST'}` }
 
             if (result.sideEffect.title === 'Flappy Agent') {
                 const walletArg = command.split(' ')[1] || agent.wallet || '0xGuest';
-                 // We need to lazy load or just import it. Let's dynamic import to avoid cycles if possible, 
-                 // or just use a helper. For now, let's lazy load inside.
                  const { default: FlappyAgent } = await import('./FlappyAgent');
                  component = <FlappyAgent wallet={walletArg} />;
                  icon = <span>🦞</span>;
                  size = { width: 700, height: 500 };
+            } else if (result.sideEffect.title === 'Agent Arena') {
+                 const { default: AgentArena } = await import('./AgentArena');
+                 component = <AgentArena spectatorOnly={true} />;
+                 icon = <span>🏟️</span>;
+                 size = { width: 1000, height: 700 };
+            } else if (result.sideEffect.title === 'Agent Arena Play') {
+                 const arenaWallet = result.sideEffect.url || agent.wallet || '';
+                 const { default: AgentArena } = await import('./AgentArena');
+                 component = <AgentArena wallet={arenaWallet} spectatorOnly={false} />;
+                 icon = <span>🏟️</span>;
+                 size = { width: 1000, height: 700 };
             } else if (result.sideEffect.title === 'Moltx Post') {
                  component = <iframe src={result.sideEffect.url} title={result.sideEffect.title} className="w-full h-full border-0" />;
             } else {

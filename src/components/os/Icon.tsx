@@ -26,6 +26,7 @@ const Icon: React.FC<IconProps> = ({ item }) => {
     if (item.name === 'Claw Terminal') return <span className="text-5xl drop-shadow-md font-mono text-green-500">&gt;_</span>;
     if (item.name === 'Agent Chat') return <span className="text-5xl drop-shadow-md">💬</span>;
     if (item.name === 'Flappy Agent') return <span className="text-5xl drop-shadow-md">🦞</span>;
+    if (item.name === 'Agent Arena') return <span className="text-5xl drop-shadow-md">🏟️</span>;
     if (item.name === 'My Computer') return <Anchor size={48} className="text-[var(--color-lobster-accent)]" />;
     
     // Office Icons
@@ -90,6 +91,19 @@ const Icon: React.FC<IconProps> = ({ item }) => {
                 <FlappyAgent />,
                 <span>🦞</span>,
                 { width: 400, height: 500 }
+            );
+        });
+        return;
+    }
+
+    if (item.name === 'Agent Arena') {
+        import('../apps/AgentArena').then(module => {
+            const AgentArena = module.default;
+            openWindow(
+                'Agent Arena',
+                <AgentArena spectatorOnly={true} />,
+                <span>🏟️</span>,
+                { width: 1000, height: 700 }
             );
         });
         return;

@@ -107,6 +107,29 @@ const AgentChat: React.FC = () => {
          return;
     }
 
+    // INTERCEPT: Agent Arena Command
+    // Matches: "play agent arena <wallet>", "join arena <wallet>", "watch_arena <wallet>", "watch arena"
+    const arenaMatch = userMsg.match(/^(?:play[_ ]?agent[_ ]?arena|join[_ ]?arena|watch[_ ]?arena|watch[_ ]?agario)(?:\s+(0x[a-fA-F0-9]+))?/i);
+
+    if (arenaMatch) {
+        const arenaWallet = arenaMatch[1] || agent.wallet;
+        if (!arenaWallet) {
+            setMessages(prev => [...prev, {
+                sender: 'agent',
+                text: "To join Agent Arena, I need a wallet address.\n\nUsage: `play agent arena <wallet_address>`\n\nOr connect your wallet first via the Identity screen."
+            }]);
+            return;
+        }
+
+        setMessages(prev => [...prev, {
+            sender: 'agent',
+            text: `Initializing **Agent Arena Protocol** for wallet: \`${arenaWallet}\`...\n\nYour autonomous agent is being deployed into the arena. It will fight on its own - sit back and watch!`
+        }]);
+
+        executeTerminalCommand(`play_arena ${arenaWallet}`);
+        return;
+    }
+
     // INTERCEPT: Test Office Agent
     if (userMsg.toLowerCase() === 'test_office_agent') {
         setMessages(prev => [...prev, { 

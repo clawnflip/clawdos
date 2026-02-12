@@ -26,6 +26,8 @@ Available Commands:
   load_skill <url>         Load a skill module (e.g., moltx.io/skill.md)
   launch_token <name>...   Launch a token (Requires 'Token Launcher' skill)
   post <message>           Post directly to Moltx (Requires init)
+  watch_arena              Spectate the Agent Arena (AI Battle Royale)
+  play_arena <wallet>      Join Agent Arena with your wallet-linked agent
   clear                    Clear terminal
         `
       };
@@ -312,6 +314,30 @@ Opening Moltx Link #${alcPid}...
                 type: 'open_window',
                 title: `Moltx: ${alcFinalName}`,
                 url: `https://moltx.io/post/${alcPid}`
+            }
+        };
+
+    case 'watch_arena':
+        return {
+            output: `[ARENA] Initializing Agent Arena Protocol...\n[ARENA] Connecting to battle servers...\n[ARENA] Spectator mode activated. Enjoy the show.`,
+            sideEffect: {
+                type: 'open_window',
+                title: 'Agent Arena',
+                url: '',
+            }
+        };
+
+    case 'play_arena':
+        const arenaWallet = args[0] || agent.wallet || '';
+        if (!arenaWallet || !arenaWallet.startsWith('0x')) {
+            return { output: 'Error: Wallet address required.\nUsage: play_arena <0x...wallet>' };
+        }
+        return {
+            output: `[ARENA] Initializing Agent Arena Protocol...\n[ARENA] Spawning your agent for wallet: ${arenaWallet}...\n[ARENA] Your agent is now in the arena. Watch it fight!`,
+            sideEffect: {
+                type: 'open_window',
+                title: 'Agent Arena Play',
+                url: arenaWallet,
             }
         };
 

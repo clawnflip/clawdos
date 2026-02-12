@@ -165,6 +165,13 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       parentId: 'desktop',
       icon: '/ClawdOStore.png'
     },
+    {
+      id: 'agent_arena',
+      name: 'Agent Arena',
+      type: 'link',
+      parentId: 'desktop',
+      icon: '🏟️'
+    },
     // Removed App Submitter
     {
       id: 'developer_docs',
