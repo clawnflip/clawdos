@@ -509,31 +509,21 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                 });
         });
 
-        // Agent Chat auto-open disabled per user request
-        /*
+        // Agent Chat auto-open for Arena event
         import('../components/apps/AgentChat')
             .then(module => {
-                console.log("OSContext: AgentChat loaded");
                 const AgentChat = module.default;
-                
-                // Left side, reduced height
-                const width = 450;
-                const height = 500;
-                const x = 50; 
-                const y = 80;
-
                 openWindow(
                     'Agent Chat',
                     <AgentChat />,
                     <span>💬</span>,
-                    { width, height },
-                    { x, y }
+                    { width: 450, height: 550 },
+                    { x: 50, y: 60 }
                 );
             })
             .catch(err => {
                 console.error("OSContext: Failed to load AgentChat", err);
             });
-        */
 
         // Auto-open ClawdOS Store
         import('../components/apps/ClawdOSStore')

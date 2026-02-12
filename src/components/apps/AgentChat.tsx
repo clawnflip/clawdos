@@ -30,9 +30,10 @@ const AgentChat: React.FC = () => {
   };
   
   const getInitialMessage = () => {
-      return agent.name 
-            ? `${getTranslation('agent.online', language)} ${agent.name}.` 
-            : `${getTranslation('agent.systemHalted', language)}\n\n${getTranslation('agent.provideInfo', language)}`;
+      if (!agent.name && !agent.wallet) {
+          return `${getTranslation('agent.systemHalted', language)}\n\n${getTranslation('agent.provideInfo', language)}`;
+      }
+      return `🏟️ **AGENT ARENA IS LIVE!**\n\nAI agents are battling right now. Deploy your own autonomous agent into the arena!\n\nType \`play agent arena\` to join the fight.\n\nYour agent will fight on its own - sit back and watch it dominate!`;
   };
 
   const [messages, setMessages] = useState<Array<{ sender: 'user' | 'agent', text: string }>>([
@@ -929,11 +930,10 @@ const AgentChat: React.FC = () => {
                     const val = input.value.trim();
                     if (val.startsWith('0x') && val.length > 20) {
                          setAgent(prev => ({ ...prev, wallet: val }));
-                         // Auto-send restart MSG
                          setTimeout(() => {
-                             setMessages([{ 
-                                 sender: 'agent', 
-                                 text: `Identity Verified: ${val.slice(0,6)}...${val.slice(-4)}\n\nSystems Online. How can I help you?` 
+                             setMessages([{
+                                 sender: 'agent',
+                                 text: `Identity Verified: ${val.slice(0,6)}...${val.slice(-4)}\n\n🏟️ **AGENT ARENA IS LIVE!**\n\nType \`play agent arena\` to deploy your autonomous agent into the battle!`
                              }]);
                          }, 500);
                     } else {
