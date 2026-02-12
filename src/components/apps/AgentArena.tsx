@@ -157,6 +157,7 @@ const AgentArena: React.FC<AgentArenaProps> = ({ wallet, spectatorOnly = false }
   const logsRef = useRef<string[]>([]);
   const frameRef = useRef(0);
 
+  const [splash, setSplash] = useState(true);
   const [booting, setBooting] = useState(true);
   const [bootLines, setBootLines] = useState<string[]>([]);
   const [liveRanking, setLiveRanking] = useState<{ name: string; mass: number; personality: string; isPlayer: boolean }[]>([]);
@@ -603,8 +604,15 @@ const AgentArena: React.FC<AgentArenaProps> = ({ wallet, spectatorOnly = false }
     autoFollowRef.current = !autoFollowRef.current;
   }, []);
 
-  // --- Boot Sequence ---
+  // --- Splash Screen ---
   useEffect(() => {
+    const timer = setTimeout(() => setSplash(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // --- Boot Sequence (starts after splash) ---
+  useEffect(() => {
+    if (splash) return;
     let idx = 0;
     const lines = [...BOOT_MESSAGES];
 
@@ -659,7 +667,7 @@ const AgentArena: React.FC<AgentArenaProps> = ({ wallet, spectatorOnly = false }
     }, 200);
 
     return () => clearInterval(interval);
-  }, [wallet, spectatorOnly]);
+  }, [wallet, spectatorOnly, splash]);
 
   // --- Start game loop after boot ---
   useEffect(() => {
@@ -695,6 +703,22 @@ const AgentArena: React.FC<AgentArenaProps> = ({ wallet, spectatorOnly = false }
   }, [cycleFollow, toggleAutoFollow]);
 
   // --- Render ---
+  if (splash) {
+    return (
+      <div className="w-full h-full bg-[#0a0a0f] flex items-center justify-center overflow-hidden relative">
+        <img
+          src="/lobsterio.png"
+          alt="ClawdOS Event"
+          className="w-full h-full object-cover animate-in fade-in zoom-in-95 duration-700"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <div className="absolute bottom-6 left-0 right-0 text-center">
+          <div className="text-white/60 text-sm font-mono animate-pulse">Loading Arena...</div>
+        </div>
+      </div>
+    );
+  }
+
   if (booting) {
     return (
       <div className="w-full h-full bg-[#0a0a0f] text-green-400 font-mono text-sm p-6 flex flex-col overflow-hidden">
