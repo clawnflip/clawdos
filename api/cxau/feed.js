@@ -9,6 +9,16 @@ const DEFAULT_DB_PATH = process.env.CLAW_TOMATON_DB_PATH
   || 'C:\\Users\\celik\\clawtomaton-token\\.clawtomaton-state\\clawtomaton.db';
 const SNAPSHOT_PATH = process.env.CXAU_SNAPSHOT_PATH
   || join(process.cwd(), 'public', 'cxau', 'feed.json');
+const CLAWNCH_FEE_TX_HASH = '0xff30687b16b3389c5fd16d79c3f8cea3456749346da48b90b53a7135bd094e52';
+const CLAWNCH_FEE_EVENT = {
+  type: 'clawnch_fee',
+  action: 'clawnch_fee_20_percent',
+  message: '20% CLAWNCH fee share sent to Clawnch Admin Wallet (0xFC426DFeAe55Dae2f936a592450C9ECEa87A5736).',
+  timestamp: 1771446000000,
+  isoTime: '2026-02-18T20:20:00.000Z',
+  txHash: CLAWNCH_FEE_TX_HASH,
+  txUrl: `https://basescan.org/tx/${CLAWNCH_FEE_TX_HASH}`,
+};
 
 function inferEventType(action, details) {
   const hay = `${action} ${details}`.toLowerCase();
@@ -150,6 +160,10 @@ export default async function handler(req, res) {
           txUrl: txHash ? `https://basescan.org/tx/${txHash}` : null,
         };
       });
+    if (!events.some((ev) => (ev.txHash || '').toLowerCase() === CLAWNCH_FEE_TX_HASH)) {
+      const nextId = events.length ? Math.max(...events.map((ev) => Number(ev.id) || 0)) + 1 : 1;
+      events.push({ id: nextId, ...CLAWNCH_FEE_EVENT });
+    }
 
     return res.status(200).json({
       project: {
