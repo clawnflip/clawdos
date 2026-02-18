@@ -197,6 +197,16 @@
       "isoTime": "2026-02-18T20:11:23.539Z",
       "txHash": null,
       "txUrl": null
+    },
+    {
+      "id": 18,
+      "type": "fees_admin_transfer",
+      "action": "clawnch_admin_transfer",
+      "message": "Agent converted 20% of all fee withdrawals to $CLAWNCH and sent to Clawnch Admin Wallet (0xFC426DFeAe55Dae2f936a592450C9ECEa87A5736).",
+      "timestamp": 1771446000000,
+      "isoTime": "2026-02-18T20:20:00.000Z",
+      "txHash": "0xff30687b16b3389c5fd16d79c3f8cea3456749346da48b90b53a7135bd094e52",
+      "txUrl": "https://basescan.org/tx/0xff30687b16b3389c5fd16d79c3f8cea3456749346da48b90b53a7135bd094e52"
     }
   ],
   "generatedAt": "2026-02-18T20:11:26.936Z",
