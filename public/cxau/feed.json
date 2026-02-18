@@ -1,0 +1,204 @@
+{
+  "project": {
+    "slug": "cxau",
+    "name": "CLAWXAU",
+    "symbol": "CXAU"
+  },
+  "agent": {
+    "name": "clawtomaton-token-agent",
+    "wallet": "0x2531C7b0425b4ab713d1288D824a07e0A8685b25",
+    "tokenAddress": "0xEFD0c746A39EFE28ED4e2789de9aebCA79245B07",
+    "creatorAddress": "0x0000000000000000000000000000000000000001",
+    "activated": true,
+    "activatedAt": "2026-02-18T17:10:54.883Z",
+    "day": 1
+  },
+  "balances": {
+    "eth": "0.001918749987833696",
+    "token": "803591238.753517954115866095"
+  },
+  "fees": {
+    "unclaimedWeth": "0",
+    "unclaimedToken": "0",
+    "totalClaimedWeth": null
+  },
+  "telemetry": {
+    "tier": "normal",
+    "lastBalanceCheck": null,
+    "lastFeeClaim": null
+  },
+  "events": [
+    {
+      "id": 1,
+      "type": "log",
+      "action": "identity_created",
+      "message": "Agent \"clawtomaton-token-agent\" created at 0x2531C7b0425b4ab713d1288D824a07e0A8685b25",
+      "timestamp": 1771429224907,
+      "isoTime": "2026-02-18T15:40:24.907Z",
+      "txHash": null,
+      "txUrl": null
+    },
+    {
+      "id": 2,
+      "type": "log",
+      "action": "soul_update",
+      "message": "SOUL.md updated (114 chars)",
+      "timestamp": 1771429224907,
+      "isoTime": "2026-02-18T15:40:24.907Z",
+      "txHash": null,
+      "txUrl": null
+    },
+    {
+      "id": 3,
+      "type": "activation",
+      "action": "activation",
+      "message": "Burned 1,000,000 $CLAWNCH",
+      "timestamp": 1771434654968,
+      "isoTime": "2026-02-18T17:10:54.968Z",
+      "txHash": "0x59b0768688abf29b6fd60efd2a27219bb69d8e967be99acc49820fd9d3f52688",
+      "txUrl": "https://basescan.org/tx/0x59b0768688abf29b6fd60efd2a27219bb69d8e967be99acc49820fd9d3f52688"
+    },
+    {
+      "id": 4,
+      "type": "deploy",
+      "action": "manual_deploy_clawnchdeployer",
+      "message": "Token deployed via ClawnchDeployer: $CXAU at 0xEFD0c746A39EFE28ED4e2789de9aebCA79245B07",
+      "timestamp": 1771435177864,
+      "isoTime": "2026-02-18T17:19:37.864Z",
+      "txHash": "0x058a7dfb25e98a5f0d3ae137add07557be8a617d3c0fb2895bb5d684a33f9ef8",
+      "txUrl": "https://basescan.org/tx/0x058a7dfb25e98a5f0d3ae137add07557be8a617d3c0fb2895bb5d684a33f9ef8"
+    },
+    {
+      "id": 5,
+      "type": "heartbeat_proof",
+      "action": "heartbeat_proof",
+      "message": "Day 1, normal, cycle start",
+      "timestamp": 1771444802731,
+      "isoTime": "2026-02-18T20:00:02.731Z",
+      "txHash": null,
+      "txUrl": null
+    },
+    {
+      "id": 6,
+      "type": "fees_claimed",
+      "action": "fees_claimed",
+      "message": "heartbeat: Claim check. unclaimedWETH=0.000025364858958674 unclaimedToken=3079166.599999999999999999",
+      "timestamp": 1771444813134,
+      "isoTime": "2026-02-18T20:00:13.134Z",
+      "txHash": "0x86be065a045e444d7efcb54a563f2d7ad32dc251ed3c98a8efddeb78f41fd07d",
+      "txUrl": "https://basescan.org/tx/0x86be065a045e444d7efcb54a563f2d7ad32dc251ed3c98a8efddeb78f41fd07d"
+    },
+    {
+      "id": 7,
+      "type": "heartbeat_proof",
+      "action": "buyback",
+      "message": "heartbeat: Bought 111850683.95071026134775495 $CXAU for 0.015 ETH",
+      "timestamp": 1771444871441,
+      "isoTime": "2026-02-18T20:01:11.441Z",
+      "txHash": "0xec0df718958b27742992228ce848f1b5f305a0ee8046b2ca41c6ff4dc5e4713b",
+      "txUrl": "https://basescan.org/tx/0xec0df718958b27742992228ce848f1b5f305a0ee8046b2ca41c6ff4dc5e4713b"
+    },
+    {
+      "id": 8,
+      "type": "burn",
+      "action": "burn",
+      "message": "Burned 55925341.975355130673877475 $CXAU",
+      "timestamp": 1771444871441,
+      "isoTime": "2026-02-18T20:01:11.441Z",
+      "txHash": "0xdefc13c1229cdaf98e1318a7fb264677e0ddf5bfe55b4c7f4e368a3435398591",
+      "txUrl": "https://basescan.org/tx/0xdefc13c1229cdaf98e1318a7fb264677e0ddf5bfe55b4c7f4e368a3435398591"
+    },
+    {
+      "id": 9,
+      "type": "heartbeat_proof",
+      "action": "heartbeat_proof",
+      "message": "Day 1, normal, cycle start",
+      "timestamp": 1771445408449,
+      "isoTime": "2026-02-18T20:10:08.449Z",
+      "txHash": null,
+      "txUrl": null
+    },
+    {
+      "id": 10,
+      "type": "heartbeat_proof",
+      "action": "buyback",
+      "message": "heartbeat: Bought 242133608.907479034541888575 $CXAU for 0.032442153485486199 ETH",
+      "timestamp": 1771445420934,
+      "isoTime": "2026-02-18T20:10:20.934Z",
+      "txHash": "0x860e45ce3e646b40a493808e57d722cfa9c84da39211a5bf42086ef705426168",
+      "txUrl": "https://basescan.org/tx/0x860e45ce3e646b40a493808e57d722cfa9c84da39211a5bf42086ef705426168"
+    },
+    {
+      "id": 11,
+      "type": "burn",
+      "action": "burn",
+      "message": "Burned 121066804.453739517270944287 $CXAU",
+      "timestamp": 1771445423874,
+      "isoTime": "2026-02-18T20:10:23.874Z",
+      "txHash": "0x4e75709004046dd8441e09bf86b33b1bf2877f3d2e99f723b66f3b4ee2fdc1ce",
+      "txUrl": "https://basescan.org/tx/0x4e75709004046dd8441e09bf86b33b1bf2877f3d2e99f723b66f3b4ee2fdc1ce"
+    },
+    {
+      "id": 12,
+      "type": "heartbeat_proof",
+      "action": "heartbeat_proof",
+      "message": "Day 1, normal, cycle complete",
+      "timestamp": 1771445424118,
+      "isoTime": "2026-02-18T20:10:24.118Z",
+      "txHash": null,
+      "txUrl": null
+    },
+    {
+      "id": 13,
+      "type": "heartbeat_proof",
+      "action": "heartbeat_proof",
+      "message": "Day 1, normal, cycle start",
+      "timestamp": 1771445458173,
+      "isoTime": "2026-02-18T20:10:58.173Z",
+      "txHash": null,
+      "txUrl": null
+    },
+    {
+      "id": 14,
+      "type": "fees_claimed",
+      "action": "fees_claimed",
+      "message": "heartbeat: claim check, weth=0.000149476047904191 token=2114725.607987734196085285",
+      "timestamp": 1771445470184,
+      "isoTime": "2026-02-18T20:11:10.184Z",
+      "txHash": "0x29e6a4f0a723a4afcbcf00d9e94f9d62e4b80392c8d95ddc23d58c49a32adfc9",
+      "txUrl": "https://basescan.org/tx/0x29e6a4f0a723a4afcbcf00d9e94f9d62e4b80392c8d95ddc23d58c49a32adfc9"
+    },
+    {
+      "id": 15,
+      "type": "heartbeat_proof",
+      "action": "buyback",
+      "message": "heartbeat: Bought 157708527.543574430118314325 $CXAU for 0.021252867296397768 ETH",
+      "timestamp": 1771445479859,
+      "isoTime": "2026-02-18T20:11:19.859Z",
+      "txHash": "0xab2801b1b986e98b17771c6b49a0e76fe9308a2faddf1cc67291274115e2388d",
+      "txUrl": "https://basescan.org/tx/0xab2801b1b986e98b17771c6b49a0e76fe9308a2faddf1cc67291274115e2388d"
+    },
+    {
+      "id": 16,
+      "type": "burn",
+      "action": "burn",
+      "message": "Burned 78854263.771787215059157162 $CXAU",
+      "timestamp": 1771445483270,
+      "isoTime": "2026-02-18T20:11:23.270Z",
+      "txHash": "0x67acab074d70f5a0f9d49ac4c6e7a2a0758e58f89288eb7f61bb7ca617f4fd01",
+      "txUrl": "https://basescan.org/tx/0x67acab074d70f5a0f9d49ac4c6e7a2a0758e58f89288eb7f61bb7ca617f4fd01"
+    },
+    {
+      "id": 17,
+      "type": "heartbeat_proof",
+      "action": "heartbeat_proof",
+      "message": "Day 1, normal, cycle complete",
+      "timestamp": 1771445483539,
+      "isoTime": "2026-02-18T20:11:23.539Z",
+      "txHash": null,
+      "txUrl": null
+    }
+  ],
+  "generatedAt": "2026-02-18T20:11:26.936Z",
+  "source": "snapshot"
+}

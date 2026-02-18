@@ -2,9 +2,13 @@ import Database from 'better-sqlite3';
 import { ClawnchReader, getAddresses } from '@clawnch/clawncher-sdk';
 import { createPublicClient, formatEther, formatUnits, http, parseAbi } from 'viem';
 import { base } from 'viem/chains';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const DEFAULT_DB_PATH = process.env.CLAW_TOMATON_DB_PATH
   || 'C:\\Users\\celik\\clawtomaton-token\\.clawtomaton-state\\clawtomaton.db';
+const SNAPSHOT_PATH = process.env.CXAU_SNAPSHOT_PATH
+  || join(process.cwd(), 'public', 'cxau', 'feed.json');
 
 function inferEventType(action, details) {
   const hay = `${action} ${details}`.toLowerCase();
@@ -39,12 +43,20 @@ export default async function handler(req, res) {
   try {
     db = new Database(DEFAULT_DB_PATH, { readonly: true });
   } catch (e) {
-    return res.status(500).json({
-      error: {
-        code: 'DB_OPEN_FAILED',
-        message: `Could not open clawtomaton db at ${DEFAULT_DB_PATH}`,
-        detail: e instanceof Error ? e.message : String(e),
-      },
+    if (existsSync(SNAPSHOT_PATH)) {
+      const snapshot = JSON.parse(readFileSync(SNAPSHOT_PATH, 'utf-8'));
+      return res.status(200).json({
+        ...snapshot,
+        source: 'snapshot',
+        warning: 'Live DB unavailable in this environment, serving snapshot.',
+      });
+    }
+    return res.status(200).json({
+      project: { slug: 'cxau', name: 'CLAWXAU', symbol: 'CXAU' },
+      source: 'unavailable',
+      warning: 'Live DB unavailable and no snapshot found.',
+      events: [],
+      generatedAt: new Date().toISOString(),
     });
   }
 

@@ -221,9 +221,16 @@
     async function load() {
       try {
         errorEl.textContent = '';
-        const res = await fetch('/api/cxau/feed', { cache: 'no-store' });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error?.message || 'Feed request failed');
+        let data = null;
+        try {
+          const snapRes = await fetch('/cxau/feed.json', { cache: 'no-store' });
+          if (snapRes.ok) data = await snapRes.json();
+        } catch {}
+        if (!data) {
+          const res = await fetch('/api/cxau/feed', { cache: 'no-store' });
+          data = await res.json();
+          if (!res.ok) throw new Error(data?.error?.message || 'Feed request failed');
+        }
 
         document.getElementById('agentName').textContent = data.agent?.name || '-';
         document.getElementById('agentWallet').textContent = short(data.agent?.wallet);
@@ -236,7 +243,7 @@
         document.getElementById('dayLine').textContent = data.agent?.day ? `Day ${data.agent.day}` : 'Day -';
 
         renderTimeline(data.events || []);
-        footerEl.textContent = `Updated: ${fmtTime(data.generatedAt)} | events: ${(data.events || []).length}`;
+        footerEl.textContent = `Updated: ${fmtTime(data.generatedAt)} | source: ${data.source || 'live'} | events: ${(data.events || []).length}`;
       } catch (e) {
         errorEl.textContent = e.message || String(e);
       }

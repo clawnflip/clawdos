@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cxau:heartbeat": "node scripts/cxau-heartbeat.mjs",
+    "cxau:snapshot": "node scripts/export-cxau-feed.mjs",
+    "cxau:tick": "npm run cxau:heartbeat && npm run cxau:snapshot",
+    "cxau:daemon": "node scripts/cxau-daemon.mjs"
   },
   "dependencies": {
     "@clawnch/clawncher-sdk": "^0.1.1",
