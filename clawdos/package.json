@@ -1,0 +1,27 @@
+﻿{
+  "name": "clawdos",
+  "version": "0.1.0",
+  "description": "ClawdOS Terminal CLI - comprehensive command line environment",
+  "type": "module",
+  "bin": {
+    "clawdos": "bin/clawdos.js"
+  },
+  "main": "src/cli.js",
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "clawdos",
+    "terminal",
+    "cli",
+    "shell"
+  ],
+  "author": "ClawdOS",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

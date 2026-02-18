@@ -1,0 +1,184 @@
+import Database from 'better-sqlite3';
+import { ClawnchReader, getAddresses } from '@clawnch/clawncher-sdk';
+import { createPublicClient, formatEther, formatUnits, http, parseAbi } from 'viem';
+import { base } from 'viem/chains';
+
+const DEFAULT_DB_PATH = process.env.CLAW_TOMATON_DB_PATH
+  || 'C:\\Users\\celik\\clawtomaton-token\\.clawtomaton-state\\clawtomaton.db';
+
+function inferEventType(action, details) {
+  const hay = `${action} ${details}`.toLowerCase();
+  if (hay.includes('activation') || hay.includes('burned 1,000,000')) return 'activation';
+  if (hay.includes('deploy')) return 'deploy';
+  if (hay.includes('claim')) return 'fees_claimed';
+  if (hay.includes('milestone')) return 'milestone';
+  if (hay.includes('run_') || hay.includes('heartbeat')) return 'heartbeat_proof';
+  if (hay.includes('buyback')) return 'buyback';
+  if (hay.includes('burn')) return 'burn';
+  return 'log';
+}
+
+function toIso(ts) {
+  if (!ts) return null;
+  const n = Number(ts);
+  if (Number.isNaN(n)) return null;
+  return new Date(n).toISOString();
+}
+
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: { code: 'METHOD_NOT_ALLOWED', message: 'Use GET.' } });
+  }
+
+  let db;
+  try {
+    db = new Database(DEFAULT_DB_PATH, { readonly: true });
+  } catch (e) {
+    return res.status(500).json({
+      error: {
+        code: 'DB_OPEN_FAILED',
+        message: `Could not open clawtomaton db at ${DEFAULT_DB_PATH}`,
+        detail: e instanceof Error ? e.message : String(e),
+      },
+    });
+  }
+
+  try {
+    const identity = db.prepare('SELECT * FROM identity WHERE id = 1').get();
+    if (!identity) {
+      return res.status(404).json({ error: { code: 'IDENTITY_NOT_FOUND', message: 'No agent identity found.' } });
+    }
+
+    const activation = db.prepare('SELECT * FROM activation WHERE id = 1').get();
+    const survival = db.prepare('SELECT * FROM survival WHERE id = 1').get();
+    const auditRows = db.prepare('SELECT * FROM audit_log ORDER BY id DESC LIMIT 200').all();
+
+    const publicClient = createPublicClient({
+      chain: base,
+      transport: http(process.env.BASE_RPC_URL || 'https://mainnet.base.org'),
+    });
+
+    const walletAddress = identity.address;
+    const tokenAddress = identity.token_address || null;
+    const tokenSymbol = identity.token_symbol || 'CXAU';
+
+    let ethBalance = '0';
+    let tokenBalance = null;
+    let unclaimedWethFees = null;
+    let unclaimedTokenFees = null;
+    let tokenDecimals = 18;
+
+    try {
+      const [eth] = await Promise.all([
+        publicClient.getBalance({ address: walletAddress }),
+      ]);
+      ethBalance = formatEther(eth);
+    } catch {
+      // Ignore chain read failures and keep fallback values.
+    }
+
+    if (tokenAddress) {
+      try {
+        const [decimals, bal] = await Promise.all([
+          publicClient.readContract({
+            address: tokenAddress,
+            abi: parseAbi(['function decimals() view returns (uint8)']),
+            functionName: 'decimals',
+          }),
+          publicClient.readContract({
+            address: tokenAddress,
+            abi: parseAbi(['function balanceOf(address) view returns (uint256)']),
+            functionName: 'balanceOf',
+            args: [walletAddress],
+          }),
+        ]);
+        tokenDecimals = Number(decimals);
+        tokenBalance = formatUnits(bal, tokenDecimals);
+      } catch {
+        tokenBalance = null;
+      }
+
+      try {
+        const reader = new ClawnchReader({ publicClient, network: 'mainnet' });
+        const addresses = getAddresses('mainnet');
+        const [wethFees, tokenFees] = await Promise.all([
+          reader.getAvailableFees(walletAddress, addresses.infrastructure.weth),
+          reader.getAvailableFees(walletAddress, tokenAddress),
+        ]);
+        unclaimedWethFees = formatEther(wethFees);
+        unclaimedTokenFees = formatUnits(tokenFees, tokenDecimals);
+      } catch {
+        unclaimedWethFees = null;
+        unclaimedTokenFees = null;
+      }
+    }
+
+    const activatedAt = activation?.activated_at ? Number(activation.activated_at) : null;
+    const day = activatedAt ? Math.max(1, Math.floor((Date.now() - activatedAt) / 86400000) + 1) : null;
+
+    const events = auditRows
+      .slice()
+      .reverse()
+      .map((row) => {
+        const type = inferEventType(row.action, row.details || '');
+        const txHash = row.tx_hash || null;
+        return {
+          id: row.id,
+          type,
+          action: row.action,
+          message: row.details,
+          timestamp: Number(row.timestamp),
+          isoTime: toIso(row.timestamp),
+          txHash,
+          txUrl: txHash ? `https://basescan.org/tx/${txHash}` : null,
+        };
+      });
+
+    return res.status(200).json({
+      project: {
+        slug: 'cxau',
+        name: 'CLAWXAU',
+        symbol: tokenSymbol,
+      },
+      agent: {
+        name: identity.name,
+        wallet: walletAddress,
+        tokenAddress,
+        creatorAddress: identity.creator_address,
+        activated: Boolean(activation),
+        activatedAt: toIso(activation?.activated_at),
+        day,
+      },
+      balances: {
+        eth: ethBalance,
+        token: tokenBalance,
+      },
+      fees: {
+        unclaimedWeth: unclaimedWethFees,
+        unclaimedToken: unclaimedTokenFees,
+        totalClaimedWeth: survival?.total_fees_claimed ? formatEther(BigInt(survival.total_fees_claimed)) : null,
+      },
+      telemetry: {
+        tier: survival?.tier || 'normal',
+        lastBalanceCheck: toIso(survival?.last_balance_check),
+        lastFeeClaim: toIso(survival?.last_fee_claim),
+      },
+      events,
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (e) {
+    return res.status(500).json({
+      error: {
+        code: 'FEED_FAILED',
+        message: e instanceof Error ? e.message : String(e),
+      },
+    });
+  } finally {
+    db.close();
+  }
+}

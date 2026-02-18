@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CXAU Transparency Feed</title>
+  <style>
+    :root {
+      --bg-0: #05080d;
+      --bg-1: #0b1220;
+      --bg-2: #10192b;
+      --line: #26334a;
+      --text: #e7edf8;
+      --muted: #9eb0cf;
+      --brand: #f5bf49;
+      --accent: #58d8b8;
+      --danger: #ff6a6a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 85% -10%, rgba(88,216,184,0.18), transparent 45%),
+        radial-gradient(1000px 650px at -5% 0%, rgba(245,191,73,0.16), transparent 50%),
+        linear-gradient(180deg, var(--bg-0), var(--bg-1) 35%, var(--bg-2));
+    }
+    .wrap {
+      width: min(1100px, 92vw);
+      margin: 30px auto 70px;
+    }
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5.8vw, 56px);
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+    .sub {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .badge {
+      border: 1px solid rgba(245,191,73,0.45);
+      background: rgba(245,191,73,0.12);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: #ffd872;
+      white-space: nowrap;
+    }
+    .cards {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      margin: 18px 0 26px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(16, 25, 43, 0.6);
+      padding: 14px;
+      backdrop-filter: blur(4px);
+    }
+    .k {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .v {
+      font-size: 23px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .m {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-all;
+    }
+    .section-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+    .timeline {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(8, 13, 24, 0.72);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 200px 145px 1fr 42px;
+      gap: 12px;
+      padding: 12px 14px;
+      border-top: 1px solid rgba(38, 51, 74, 0.66);
+      align-items: start;
+    }
+    .row:first-child { border-top: none; }
+    .time { font-size: 12px; color: var(--muted); }
+    .type {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 999px;
+      border: 1px solid rgba(88,216,184,0.35);
+      color: #98f1dc;
+      background: rgba(88,216,184,0.11);
+      padding: 5px 10px;
+      text-transform: lowercase;
+      letter-spacing: 0.06em;
+      width: max-content;
+    }
+    .msg { font-size: 14px; line-height: 1.4; }
+    .tx a {
+      color: var(--brand);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .tx a:hover { text-decoration: underline; }
+    .footer {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .error {
+      margin-top: 12px;
+      color: var(--danger);
+      font-size: 13px;
+    }
+    @media (max-width: 860px) {
+      .row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>CXAU Transparency</h1>
+        <div class="sub">Live feed of AI decisions, on-chain actions, and fee state.</div>
+      </div>
+      <div class="badge" id="refreshBadge">Auto refresh: every 15s</div>
+    </div>
+
+    <div class="cards">
+      <div class="card"><div class="k">Agent</div><div class="v" id="agentName">-</div><div class="m" id="agentWallet">-</div></div>
+      <div class="card"><div class="k">Token</div><div class="v" id="tokenSymbol">-</div><div class="m" id="tokenAddress">-</div></div>
+      <div class="card"><div class="k">ETH Balance</div><div class="v" id="ethBalance">-</div><div class="m">Agent wallet</div></div>
+      <div class="card"><div class="k">Unclaimed WETH Fees</div><div class="v" id="wethFees">-</div><div class="m">Claimable now</div></div>
+      <div class="card"><div class="k">Unclaimed Token Fees</div><div class="v" id="tokenFees">-</div><div class="m">Claimable now</div></div>
+      <div class="card"><div class="k">Survival State</div><div class="v" id="tier">-</div><div class="m" id="dayLine">-</div></div>
+    </div>
+
+    <h2 class="section-title">Event Timeline</h2>
+    <div class="timeline" id="timeline"></div>
+    <div class="footer" id="footer">Loading...</div>
+    <div class="error" id="error"></div>
+  </div>
+
+  <script>
+    const timelineEl = document.getElementById('timeline');
+    const footerEl = document.getElementById('footer');
+    const errorEl = document.getElementById('error');
+
+    function short(addr) {
+      if (!addr) return '-';
+      return addr.slice(0, 8) + '...' + addr.slice(-6);
+    }
+
+    function fmtTime(iso) {
+      if (!iso) return '-';
+      const d = new Date(iso);
+      return d.toLocaleString('en-US', { hour12: false });
+    }
+
+    function v(x, suffix = '') {
+      if (x === null || x === undefined || x === '') return '-';
+      const n = Number(x);
+      if (Number.isNaN(n)) return String(x);
+      return `${n.toLocaleString('en-US', { maximumFractionDigits: 6 })}${suffix}`;
+    }
+
+    function renderTimeline(events) {
+      if (!events || events.length === 0) {
+        timelineEl.innerHTML = '<div class="row"><div class="msg">No events yet.</div></div>';
+        return;
+      }
+
+      timelineEl.innerHTML = events
+        .slice()
+        .reverse()
+        .map((ev) => `
+          <div class="row">
+            <div class="time">${fmtTime(ev.isoTime)}</div>
+            <div><span class="type">${ev.type || ev.action}</span></div>
+            <div class="msg">${ev.message || ev.action}</div>
+            <div class="tx">${ev.txUrl ? `<a href="${ev.txUrl}" target="_blank" rel="noreferrer">tx</a>` : ''}</div>
+          </div>
+        `).join('');
+    }
+
+    async function load() {
+      try {
+        errorEl.textContent = '';
+        const res = await fetch('/api/cxau/feed', { cache: 'no-store' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error?.message || 'Feed request failed');
+
+        document.getElementById('agentName').textContent = data.agent?.name || '-';
+        document.getElementById('agentWallet').textContent = short(data.agent?.wallet);
+        document.getElementById('tokenSymbol').textContent = data.project?.symbol || '-';
+        document.getElementById('tokenAddress').textContent = short(data.agent?.tokenAddress);
+        document.getElementById('ethBalance').textContent = v(data.balances?.eth, ' ETH');
+        document.getElementById('wethFees').textContent = v(data.fees?.unclaimedWeth, ' WETH');
+        document.getElementById('tokenFees').textContent = v(data.fees?.unclaimedToken, ` ${data.project?.symbol || ''}`);
+        document.getElementById('tier').textContent = (data.telemetry?.tier || '-').toUpperCase();
+        document.getElementById('dayLine').textContent = data.agent?.day ? `Day ${data.agent.day}` : 'Day -';
+
+        renderTimeline(data.events || []);
+        footerEl.textContent = `Updated: ${fmtTime(data.generatedAt)} | events: ${(data.events || []).length}`;
+      } catch (e) {
+        errorEl.textContent = e.message || String(e);
+      }
+    }
+
+    load();
+    setInterval(load, 15000);
+  </script>
+</body>
+</html>
