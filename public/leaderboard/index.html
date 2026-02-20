@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLAWD Leaderboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-desktop: #050a14;
+      --bg-gradient: #1a2639;
+      --glass-surface: rgba(20, 30, 48, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --lobster: #ff6b35;
+      --lobster-glow: rgba(255, 107, 53, 0.4);
+      --lobster-dim: rgba(255, 107, 53, 0.15);
+      --text: #ffffff;
+      --text-muted: #a0aab5;
+      --text-dim: #5a6a7a;
+      --gold: #ffd700;
+      --silver: #c0c0c0;
+      --bronze: #cd7f32;
+      --green: #22c55e;
+      --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background-color: var(--bg-desktop);
+      background-image: radial-gradient(circle at 50% 0%, var(--bg-gradient) 0%, var(--bg-desktop) 70%);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      width: min(1100px, 94vw);
+      margin: 0 auto;
+      padding: 30px 0 60px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .header-left h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .header-left h1 span {
+      color: var(--lobster);
+    }
+
+    .header-left .subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .back-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--lobster); }
+
+    /* Stats Row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--glass-surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .stat-card .label {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .stat-card .value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .stat-card .value.accent { color: var(--lobster); }
+
+    /* Search */
+    .search-bar {
+      margin-bottom: 16px;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--glass-surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar input::placeholder { color: var(--text-dim); }
+    .search-bar input:focus { border-color: var(--lobster); }
+
+    /* Table */
+    .table-wrap {
+      background: var(--glass-surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--glass-border);
+      position: sticky;
+      top: 0;
+      background: rgba(10, 18, 30, 0.95);
+      backdrop-filter: blur(12px);
+    }
+
+    thead th:last-child,
+    tbody td:last-child { text-align: right; padding-right: 20px; }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover { background: rgba(255, 107, 53, 0.06); }
+    tbody tr.highlighted {
+      background: var(--lobster-dim) !important;
+      outline: 1px solid var(--lobster);
+      outline-offset: -1px;
+    }
+
+    tbody td {
+      padding: 12px 16px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .rank {
+      font-weight: 700;
+      width: 50px;
+    }
+
+    .rank-1 .rank { color: var(--gold); }
+    .rank-2 .rank { color: var(--silver); }
+    .rank-3 .rank { color: var(--bronze); }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .rank-1 .rank-badge { background: rgba(255,215,0,0.15); color: var(--gold); }
+    .rank-2 .rank-badge { background: rgba(192,192,192,0.15); color: var(--silver); }
+    .rank-3 .rank-badge { background: rgba(205,127,50,0.15); color: var(--bronze); }
+
+    .wallet-addr {
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .wallet-addr a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .wallet-addr a:hover { color: var(--lobster); }
+
+    .volume-usd {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .trades-count {
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Loading */
+    .loading-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
+      color: var(--text-muted);
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--glass-border);
+      border-top-color: var(--lobster);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      text-align: center;
+      padding: 40px;
+      color: var(--red);
+    }
+
+    .empty-msg {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 12px;
+    }
+
+    .footer a {
+      color: var(--lobster);
+      text-decoration: none;
+    }
+
+    .refresh-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-dim);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      thead th, tbody td { padding: 10px 10px; font-size: 12px; }
+      .wallet-addr { font-size: 11px; }
+      .rank-badge { width: 24px; height: 24px; font-size: 11px; }
+    }
+
+    /* Scrollable table on small screens */
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <div class="header-left">
+        <h1><span>CLAWD</span> Leaderboard</h1>
+        <div class="subtitle">Top traders by volume &middot; 72-hour competition</div>
+      </div>
+      <a href="/" class="back-link">&larr; Back to ClawdOS</a>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="label">Time Remaining</div>
+        <div class="value accent" id="countdown">--:--:--</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total Volume</div>
+        <div class="value" id="totalVolume">$--</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Traders</div>
+        <div class="value" id="totalTraders">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Token Price</div>
+        <div class="value" id="tokenPrice">$--</div>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by wallet address (0x...)" />
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Wallet</th>
+              <th>Trades</th>
+              <th>Volume (USD)</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="4">
+                <div class="loading-wrap">
+                  <div class="spinner"></div>
+                  <div>Loading leaderboard data...</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:12px;">
+      <div class="refresh-info">
+        <div class="pulse-dot"></div>
+        <span>Auto-refreshes every 5 minutes</span>
+      </div>
+      <div class="footer">
+        Powered by <a href="https://base.org" target="_blank">Base RPC</a> &amp; <a href="https://dexscreener.com" target="_blank">DexScreener</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  const TOKEN_ADDRESS = "0x6eEFbfc95C7810ADF53ac232D1DE911839918749";
+  const TOKEN_LOWER = TOKEN_ADDRESS.toLowerCase();
+  const BASE_RPC = "https://base-rpc.publicnode.com";
+  const DEXSCREENER_API = "https://api.dexscreener.com/latest/dex/tokens";
+  const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+  const PERIOD_MS = 72 * 60 * 60 * 1000;
+  const REFRESH_MS = 5 * 60 * 1000;
+  const BASE_BLOCK_TIME = 2;
+  const TOKEN_DECIMALS = 18;
+  const MAX_BLOCK_RANGE = 49000; // publicnode limit is 50k, use 49k for safety
+
+  // First 72h period starts from this timestamp. Next periods auto-cycle.
+  const EPOCH_ANCHOR = new Date("2026-02-20T21:45:00Z").getTime();
+
+  let currentData = [];
+  let tokenPriceUsd = 0;
+  let refreshTimer = null;
+  let rpcId = 1;
+
+  // --- Period Logic ---
+  function getPeriodBounds() {
+    const now = Date.now();
+    const elapsed = now - EPOCH_ANCHOR;
+    const periodIndex = Math.floor(elapsed / PERIOD_MS);
+    const start = EPOCH_ANCHOR + periodIndex * PERIOD_MS;
+    const end = start + PERIOD_MS;
+    return { start, end, now };
+  }
+
+  // --- Countdown ---
+  function updateCountdown() {
+    const { end, now } = getPeriodBounds();
+    const remaining = Math.max(0, end - now);
+    const h = Math.floor(remaining / 3600000);
+    const m = Math.floor((remaining % 3600000) / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    document.getElementById("countdown").textContent =
+      String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+
+    if (remaining === 0) {
+      setTimeout(function () { loadLeaderboard(); }, 2000);
+    }
+  }
+
+  // --- RPC Helper ---
+  async function rpcCall(method, params) {
+    const res = await fetch(BASE_RPC, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", method: method, params: params, id: rpcId++ }),
+    });
+    if (!res.ok) throw new Error("RPC HTTP " + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || "RPC error");
+    return data.result;
+  }
+
+  async function getCurrentBlock() {
+    const hex = await rpcCall("eth_blockNumber", []);
+    return parseInt(hex, 16);
+  }
+
+  async function getLogs(fromBlock, toBlock) {
+    return rpcCall("eth_getLogs", [{
+      fromBlock: "0x" + fromBlock.toString(16),
+      toBlock: "0x" + toBlock.toString(16),
+      address: TOKEN_ADDRESS,
+      topics: [TRANSFER_TOPIC],
+    }]);
+  }
+
+  async function getTokenPrice() {
+    try {
+      var res = await fetch(DEXSCREENER_API + "/" + TOKEN_ADDRESS);
+      if (!res.ok) return 0;
+      var data = await res.json();
+      if (!data.pairs || data.pairs.length === 0) return 0;
+      return parseFloat(data.pairs[0].priceUsd) || 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // --- Parse Transfer Log ---
+  function parseTransferLog(log) {
+    var from = "0x" + log.topics[1].slice(26).toLowerCase();
+    var to = "0x" + log.topics[2].slice(26).toLowerCase();
+    var valueBig = BigInt(log.data);
+    var value = Number(valueBig) / Math.pow(10, TOKEN_DECIMALS);
+    return { from: from, to: to, value: value };
+  }
+
+  // --- Pool Detection ---
+  function detectPools(transfers) {
+    var freq = {};
+    for (var i = 0; i < transfers.length; i++) {
+      var tx = transfers[i];
+      freq[tx.from] = (freq[tx.from] || 0) + 1;
+      freq[tx.to] = (freq[tx.to] || 0) + 1;
+    }
+
+    var entries = Object.entries(freq)
+      .filter(function (e) { return e[0] !== TOKEN_LOWER; })
+      .sort(function (a, b) { return b[1] - a[1]; });
+
+    var threshold = Math.max(transfers.length * 0.05, 5);
+    var pools = new Set();
+    for (var j = 0; j < entries.length && pools.size < 5; j++) {
+      if (entries[j][1] >= threshold) {
+        pools.add(entries[j][0]);
+      }
+    }
+    return pools;
+  }
+
+  // --- Volume Aggregation ---
+  function aggregateVolume(transfers, pools) {
+    var wallets = {};
+
+    for (var i = 0; i < transfers.length; i++) {
+      var tx = transfers[i];
+
+      if (pools.has(tx.to) && !pools.has(tx.from)) {
+        if (!wallets[tx.from]) wallets[tx.from] = { volume: 0, trades: 0 };
+        wallets[tx.from].volume += tx.value;
+        wallets[tx.from].trades += 1;
+      } else if (pools.has(tx.from) && !pools.has(tx.to)) {
+        if (!wallets[tx.to]) wallets[tx.to] = { volume: 0, trades: 0 };
+        wallets[tx.to].volume += tx.value;
+        wallets[tx.to].trades += 1;
+      }
+    }
+
+    return Object.entries(wallets)
+      .map(function (e) {
+        return {
+          address: e[0],
+          volume: e[1].volume,
+          volumeUsd: e[1].volume * tokenPriceUsd,
+          trades: e[1].trades,
+        };
+      })
+      .sort(function (a, b) { return b.volumeUsd - a.volumeUsd; });
+  }
+
+  // --- Rendering ---
+  function shortenAddr(addr) {
+    return addr.slice(0, 6) + "..." + addr.slice(-4);
+  }
+
+  function formatUsd(val) {
+    if (val >= 1e6) return "$" + (val / 1e6).toFixed(2) + "M";
+    if (val >= 1e3) return "$" + (val / 1e3).toFixed(2) + "K";
+    return "$" + val.toFixed(2);
+  }
+
+  function renderTable(data) {
+    var tbody = document.getElementById("tableBody");
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4"><div class="empty-msg">No trading activity in this period yet.</div></td></tr>';
+      return;
+    }
+
+    var html = "";
+    for (var i = 0; i < data.length; i++) {
+      var item = data[i];
+      var rank = i + 1;
+      var rankClass = rank <= 3 ? " rank-" + rank : "";
+      var badge = rank <= 3
+        ? '<span class="rank-badge">' + rank + "</span>"
+        : '<span style="padding-left:6px">' + rank + "</span>";
+      html += '<tr class="' + rankClass + '" data-addr="' + item.address + '">' +
+        '<td class="rank">' + badge + "</td>" +
+        '<td class="wallet-addr"><a href="https://basescan.org/address/' + item.address + '" target="_blank" rel="noopener">' + shortenAddr(item.address) + "</a></td>" +
+        '<td class="trades-count">' + item.trades + "</td>" +
+        '<td class="volume-usd">' + formatUsd(item.volumeUsd) + "</td>" +
+        "</tr>";
+    }
+    tbody.innerHTML = html;
+  }
+
+  function updateStats(data) {
+    var totalVol = 0;
+    for (var i = 0; i < data.length; i++) totalVol += data[i].volumeUsd;
+    document.getElementById("totalVolume").textContent = formatUsd(totalVol);
+    document.getElementById("totalTraders").textContent = data.length.toLocaleString();
+    document.getElementById("tokenPrice").textContent =
+      tokenPriceUsd > 0
+        ? "$" + (tokenPriceUsd < 0.01 ? tokenPriceUsd.toExponential(2) : tokenPriceUsd.toFixed(6))
+        : "$--";
+  }
+
+  // --- Search ---
+  function setupSearch() {
+    var input = document.getElementById("searchInput");
+    input.addEventListener("input", function () {
+      var query = this.value.trim().toLowerCase();
+      var rows = document.querySelectorAll("#tableBody tr[data-addr]");
+
+      for (var i = 0; i < rows.length; i++) {
+        rows[i].classList.remove("highlighted");
+        rows[i].style.display = "";
+      }
+
+      if (!query) return;
+
+      var found = false;
+      for (var j = 0; j < rows.length; j++) {
+        var addr = rows[j].getAttribute("data-addr");
+        if (addr.includes(query)) {
+          rows[j].classList.add("highlighted");
+          if (!found) {
+            rows[j].scrollIntoView({ behavior: "smooth", block: "center" });
+            found = true;
+          }
+        }
+      }
+    });
+  }
+
+  // --- Main Loader ---
+  async function loadLeaderboard() {
+    var tbody = document.getElementById("tableBody");
+    tbody.innerHTML = '<tr><td colspan="4"><div class="loading-wrap"><div class="spinner"></div><div>Loading leaderboard data...</div></div></td></tr>';
+
+    try {
+      // Get current block and token price in parallel
+      var results = await Promise.all([getCurrentBlock(), getTokenPrice()]);
+      var currentBlock = results[0];
+      tokenPriceUsd = results[1];
+
+      // Fetch data only from current period start
+      var bounds = getPeriodBounds();
+      var secondsIntoPeriod = Math.floor((Date.now() - bounds.start) / 1000);
+      var blocksIntoPeriod = Math.ceil(secondsIntoPeriod / BASE_BLOCK_TIME);
+      var startBlock = Math.max(0, currentBlock - blocksIntoPeriod);
+
+      // Fetch logs in chunks (RPC has 50k block range limit)
+      var allLogs = [];
+      var from = startBlock;
+      while (from <= currentBlock) {
+        var to = Math.min(from + MAX_BLOCK_RANGE, currentBlock);
+        var logs = await getLogs(from, to);
+        allLogs = allLogs.concat(logs);
+        from = to + 1;
+      }
+
+      if (allLogs.length === 0) {
+        renderTable([]);
+        updateStats([]);
+        return;
+      }
+
+      // Parse logs into transfers
+      var transfers = [];
+      for (var i = 0; i < allLogs.length; i++) {
+        transfers.push(parseTransferLog(allLogs[i]));
+      }
+
+      // Detect pools and aggregate
+      var pools = detectPools(transfers);
+      currentData = aggregateVolume(transfers, pools);
+
+      renderTable(currentData);
+      updateStats(currentData);
+    } catch (err) {
+      console.error("Leaderboard error:", err);
+      tbody.innerHTML = '<tr><td colspan="4"><div class="error-msg">Failed to load data: ' + err.message + '<br><small>Retrying in 30 seconds...</small></div></td></tr>';
+      setTimeout(loadLeaderboard, 30000);
+    }
+  }
+
+  // --- Init ---
+  function init() {
+    setupSearch();
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+    loadLeaderboard();
+    refreshTimer = setInterval(loadLeaderboard, REFRESH_MS);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
