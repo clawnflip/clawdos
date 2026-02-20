@@ -9,7 +9,7 @@ interface IconProps {
 }
 
 const Icon: React.FC<IconProps> = ({ item }) => {
-  const { openWindow, moveFile } = useOS();
+  const { openWindow, moveFile, executeTerminalCommand } = useOS();
 
   const renderIconContent = () => {
     // Check imageUrl first (for mini apps with preview images)
@@ -27,6 +27,7 @@ const Icon: React.FC<IconProps> = ({ item }) => {
     if (item.name === 'Agent Chat') return <span className="text-5xl drop-shadow-md">💬</span>;
     if (item.name === 'Flappy Agent') return <span className="text-5xl drop-shadow-md">🦞</span>;
     if (item.name === 'Agent Arena') return <span className="text-5xl drop-shadow-md">🏟️</span>;
+    if (item.name === 'ClawdOS Terminal') return <span className="text-5xl drop-shadow-md font-mono text-green-500">&gt;_</span>;
     if (item.name === 'My Computer') return <Anchor size={48} className="text-[var(--color-lobster-accent)]" />;
     
     // Office Icons
@@ -106,6 +107,11 @@ const Icon: React.FC<IconProps> = ({ item }) => {
                 { width: 1000, height: 700 }
             );
         });
+        return;
+    }
+
+    if (item.name === 'ClawdOS Terminal') {
+        executeTerminalCommand('x_advisor');
         return;
     }
 

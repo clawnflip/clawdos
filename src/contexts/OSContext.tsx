@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react';
+﻿import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -116,14 +116,14 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       name: 'Agent Chat', 
       type: 'link', 
       parentId: 'system_tools',
-      icon: '💬'
+      icon: 'ğŸ’¬'
     },
     { 
       id: 'flappy', 
       name: 'Flappy Agent', 
       type: 'link', 
       parentId: 'system_tools', 
-      icon: '🦞', 
+      icon: 'ğŸ¦', 
       url: '#' 
     },
     { 
@@ -131,7 +131,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       name: 'Open Trident Data', 
       type: 'link', 
       parentId: 'system_tools', 
-      icon: '📊', 
+      icon: 'ğŸ“Š', 
       url: '#' 
     },
     {
@@ -170,7 +170,14 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       name: 'Agent Arena',
       type: 'link',
       parentId: 'desktop',
-      icon: '🏟️'
+      icon: 'ğŸŸï¸'
+    },
+    {
+      id: 'twitter_project_advisor',
+      name: 'ClawdOS Terminal',
+      type: 'link',
+      parentId: 'desktop',
+      icon: '>'
     },
     // Removed App Submitter
     {
@@ -178,7 +185,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       name: 'Developer Docs',
       type: 'link',
       parentId: 'system_tools',
-      icon: '📖'
+      icon: 'ğŸ“–'
     },
     
     // Office Suite - Move to System Tools
@@ -193,21 +200,21 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
         name: 'ClawdWord',
         type: 'link',
         parentId: 'office_folder',
-        icon: '📝'
+        icon: 'ğŸ“'
     },
     {
         id: 'clawsexcel',
         name: 'ClawdExcel',
         type: 'link',
         parentId: 'office_folder',
-        icon: '📊'
+        icon: 'ğŸ“Š'
     },
     {
         id: 'clawdpoint',
         name: 'ClawdPoint',
         type: 'link',
         parentId: 'office_folder',
-        icon: '📽️'
+        icon: 'ğŸ“½ï¸'
     },
     
     // Kept on Desktop
@@ -217,7 +224,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       type: 'link', 
       parentId: 'desktop', 
       url: 'https://clawn.ch',
-      icon: '🚀'
+      icon: 'ğŸš€'
     },
     { 
       id: '3', 
@@ -430,7 +437,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                 openWindow(
                     "Agent Notes.txt",
                     <ClawdWord fileId={docId} initialContent={docContent} fileName="Agent Notes.txt" />,
-                    <span>📝</span>,
+                    <span>ğŸ“</span>,
                     { width: 600, height: 500 }
                 );
              });
@@ -442,7 +449,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                     openWindow(
                         "Agent Data.xlsx",
                         <ClawdExcel fileId={sheetId} initialContent={JSON.stringify(fullGrid)} />,
-                        <span>📊</span>,
+                        <span>ğŸ“Š</span>,
                         { width: 800, height: 600 },
                         { x: 150, y: 100 }
                     );
@@ -456,7 +463,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                     openWindow(
                         "Agent Plan.ppt",
                         <ClawdPoint fileId={presId} initialContent={JSON.stringify(presData)} />,
-                        <span>📽️</span>,
+                        <span>ğŸ“½ï¸</span>,
                         { width: 800, height: 600 },
                         { x: 200, y: 150 }
                     );
@@ -489,7 +496,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                             type: 'file' as const,
                             parentId: 'miniapps_folder',
                             content: app.code,
-                            icon: app.icon || '📱',
+                            icon: app.icon || 'ğŸ“±',
                             appUrl: app.app_url,
                             appType: app.app_type || 'code',
                             imageUrl: app.image_url,
@@ -516,7 +523,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                 openWindow(
                     'Agent Chat',
                     <AgentChat />,
-                    <span>💬</span>,
+                    <span>ğŸ’¬</span>,
                     { width: 450, height: 550 },
                     { x: 50, y: 60 }
                 );
@@ -524,26 +531,6 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
             .catch(err => {
                 console.error("OSContext: Failed to load AgentChat", err);
             });
-
-        // Auto-open ClawdOS Store
-        import('../components/apps/ClawdOSStore')
-            .then(module => {
-                const ClawdOSStore = module.default;
-                const width = 800;
-                const height = 600;
-                // Center of remaining space or just center screen
-                const x = Math.max(520, (window.innerWidth - width) / 2 + 200); 
-                const y = 80;
-
-                openWindow(
-                    'ClawdOS Store',
-                    <ClawdOSStore />,
-                    <span>🛒</span>, // Updated icon to shopping cart/store
-                    { width, height },
-                    { x, y }
-                );
-            });
-
         // Auto-open Announcement Terminal (Left Dock)
         /* 
         import('../components/apps/AnnouncementApp')
@@ -552,7 +539,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                  openWindow(
                      'System Broadcast',
                      <AnnouncementApp />,
-                     <span>📢</span>,
+                     <span>ğŸ“¢</span>,
                      { width: 350, height: 400 },
                      { x: (window.innerWidth / 2) - 175, y: 50 }
                  );
@@ -599,3 +586,4 @@ export const useOS = () => {
   }
   return context;
 };
+

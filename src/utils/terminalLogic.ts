@@ -23,6 +23,9 @@ export const processCommand = async (input: string, agent: AgentState): Promise<
 Available Commands:
   init <name> <wallet>     Initialize Agent & Register on Moltx
   status                   Check Agent Status
+  x_advisor                Start interactive X advisor wizard
+  copy_report              Copy latest X advisor report to clipboard
+  save_report [name]       Save latest X advisor report as editable desktop .txt
   load_skill <url>         Load a skill module (e.g., moltx.io/skill.md)
   launch_token <name>...   Launch a token (Requires 'Token Launcher' skill)
   post <message>           Post directly to Moltx (Requires init)

@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/cxau", "destination": "/cxau/index.html" },
     { "source": "/v1/store/submit", "destination": "/api/v1/store/submit" },
-    { "source": "/v1/health", "destination": "/api/v1/health" }
+    { "source": "/v1/health", "destination": "/api/v1/health" },
+    { "source": "/v1/twitter/advisor", "destination": "/api/v1/twitter/advisor" }
   ]
 }
