@@ -484,8 +484,21 @@
     return { from: from, to: to, value: value };
   }
 
-  // --- Pool Detection ---
+  // --- Pool / Router Addresses ---
+  // Known DEX pool and router contracts that handle COS swaps
+  var KNOWN_POOLS = new Set([
+    "0x498581ff718922c3f8e6a244956af099b2652b2b", // Uniswap V4 PoolManager
+    "0x63d2dfea64b3433f4071a98665bcd7ca14d93496", // Uniswap V4 PositionManager
+    "0xf3622742b1e446d92e45e22923ef11c2fcd55d68", // Swap Router
+    "0xc85a919cdce8bb770ccc3e26b74484f9ad0fe539", // Aerodrome COS/USDC pool
+    "0xa408e0bdf2a8033dbf8618c9a24f5c206a9b9fe6", // Uniswap COS/other pool
+    "0x6067a37042a2b6ab84f1196460e91e95252c3712", // Router
+  ]);
+
   function detectPools(transfers) {
+    // Start with known pools, then add any high-frequency addresses
+    var pools = new Set(KNOWN_POOLS);
+
     var freq = {};
     for (var i = 0; i < transfers.length; i++) {
       var tx = transfers[i];
@@ -494,12 +507,12 @@
     }
 
     var entries = Object.entries(freq)
-      .filter(function (e) { return e[0] !== TOKEN_LOWER; })
+      .filter(function (e) { return e[0] !== TOKEN_LOWER && !pools.has(e[0]); })
       .sort(function (a, b) { return b[1] - a[1]; });
 
-    var threshold = Math.max(transfers.length * 0.05, 5);
-    var pools = new Set();
-    for (var j = 0; j < entries.length && pools.size < 5; j++) {
+    // Add addresses that appear in >10% of transfers (likely new pools/routers)
+    var threshold = Math.max(transfers.length * 0.10, 3);
+    for (var j = 0; j < entries.length && pools.size < 15; j++) {
       if (entries[j][1] >= threshold) {
         pools.add(entries[j][0]);
       }
