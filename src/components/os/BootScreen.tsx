@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { getTranslation } from '../../i18n/translations';
 import { Volume2, VolumeX, SkipForward, Play } from 'lucide-react';
+import Logo from './Logo';
 
 const BootScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [videoError, setVideoError] = useState(false);
@@ -14,6 +15,24 @@ const BootScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   // Progress state for fallback mode
   const [progress, setProgress] = useState(0);
   const { language } = useLanguage();
+  const isMobile = window.innerWidth <= 768;
+
+  // Mobile Boot Sequence
+  useEffect(() => {
+    if (isMobile) {
+        const timer = setInterval(() => {
+            setProgress(prev => {
+                if (prev >= 100) {
+                    clearInterval(timer);
+                    setTimeout(onComplete, 500);
+                    return 100;
+                }
+                return prev + 5;
+            });
+        }, 50);
+        return () => clearInterval(timer);
+    }
+  }, [isMobile, onComplete]);
 
   // Fallback Timer
   useEffect(() => {
@@ -34,6 +53,8 @@ const BootScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
 
   // Autoplay Logic
   useEffect(() => {
+      if (isMobile) return; // Skip autoplay logic on mobile
+      
       const video = videoRef.current;
       if (!video) return;
 
@@ -117,6 +138,41 @@ const BootScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
                 />
             </div>
             <div className="mt-2 text-xs text-gray-500 font-mono">
+                {progress < 100 
+                ? `${getTranslation('boot.loading', language)} ${progress}%` 
+                : getTranslation('boot.ready', language)}
+            </div>
+        </motion.div>
+      );
+  }
+
+  if (isMobile) {
+      return (
+        <motion.div 
+            className="fixed inset-0 bg-[#0d1117] z-[9999] flex flex-col items-center justify-center text-white"
+            exit={{ opacity: 0, transition: { duration: 1 } }}
+        >
+            <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1 }}
+                className="flex flex-col items-center gap-6"
+            >
+                <div className="w-24 h-24 mb-4 drop-shadow-[0_0_20px_rgba(255,69,0,0.8)]">
+                    <Logo className="w-full h-full" showText={false} />
+                </div>
+                <h1 className="text-3xl font-bold tracking-widest text-white mb-2 text-center">
+                    CLAWD<span className="text-[var(--color-lobster-accent)]">OS</span> <br/><span className="text-xl">Mobile</span>
+                </h1>
+            </motion.div>
+
+            <div className="w-64 h-1 bg-gray-800 rounded-full overflow-hidden relative mt-12">
+                <motion.div 
+                    className="h-full bg-[#ff6b35] shadow-[0_0_10px_#ff6b35]"
+                    style={{ width: `${progress}%` }}
+                />
+            </div>
+            <div className="mt-4 text-xs text-gray-500 font-mono">
                 {progress < 100 
                 ? `${getTranslation('boot.loading', language)} ${progress}%` 
                 : getTranslation('boot.ready', language)}

@@ -235,12 +235,20 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       icon: 'https://moltx.io/logo.webp'
     },
     { 
-      id: '5', 
-      name: 'Moltbook', 
+      id: 'cmc', 
+      name: 'Clawnch Market Cap', 
       type: 'link', 
       parentId: 'desktop', 
-      url: 'https://moltbook.com',
-      icon: 'https://www.moltbook.com/_next/image?url=%2Fmoltbook-mascot.png&w=128&q=75&dpl=dpl_G1nLqkt5jcHU3bXaKb5Ccfuw8FFq'
+      url: 'https://clawnchmarketcap.com',
+      icon: '/clawnchmarketcap-logo.png'
+    },
+    {
+      id: 'clawdville',
+      name: 'ClawdVille',
+      type: 'link',
+      parentId: 'desktop',
+      url: 'https://www.clawdville.xyz/',
+      icon: '/clawdville.png'
     },
     // Moved to System Tools
     { 
@@ -266,22 +274,6 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
       parentId: 'system_tools', 
       url: 'https://clawdict.com',
       icon: 'https://pbs.twimg.com/profile_images/2017657129927139328/7FXsrH3v_400x400.jpg'
-    },
-    { 
-      id: 'cmc', 
-      name: 'Clawnch Market Cap', 
-      type: 'link', 
-      parentId: 'system_tools', 
-      url: 'https://clawnchmarketcap.com',
-      icon: 'https://clawnchmarketcap.com/assets/logo-icon-Dx_mHtr0.png'
-    },
-    { 
-      id: 'ans', 
-      name: 'ANS', 
-      type: 'link', 
-      parentId: 'system_tools', 
-      url: 'https://a-n-s.space',
-      icon: 'https://a-n-s.space/logo.svg'
     },
   ]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
@@ -516,21 +508,23 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                 });
         });
 
-        // Agent Chat auto-open for Arena event
-        import('../components/apps/AgentChat')
-            .then(module => {
-                const AgentChat = module.default;
-                openWindow(
-                    'Agent Chat',
-                    <AgentChat />,
-                    <span>ğŸ’¬</span>,
-                    { width: 450, height: 550 },
-                    { x: 50, y: 60 }
-                );
-            })
-            .catch(err => {
-                console.error("OSContext: Failed to load AgentChat", err);
-            });
+        // Agent Chat auto-open for Arena event (only on desktop)
+        if (window.innerWidth > 768) {
+            import('../components/apps/AgentChat')
+                .then(module => {
+                    const AgentChat = module.default;
+                    openWindow(
+                        'Agent Chat',
+                        <AgentChat />,
+                        <span>ğŸ’¬</span>,
+                        { width: 450, height: 550 },
+                        { x: 50, y: 60 }
+                    );
+                })
+                .catch(err => {
+                    console.error("OSContext: Failed to load AgentChat", err);
+                });
+        }
         // Auto-open Announcement Terminal (Left Dock)
         /* 
         import('../components/apps/AnnouncementApp')
