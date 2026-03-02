@@ -6,8 +6,14 @@ import BootScreen from './components/os/BootScreen';
 import MobileOS from './components/os/MobileOS';
 import { useMediaQuery } from './hooks/useMediaQuery';
 import { AnimatePresence } from 'framer-motion';
+import AmbassadorApply from './components/ambassador/AmbassadorApply';
 
 function AppContent() {
+  // Routing bypass for Ambassador Apply page
+  if (window.location.pathname === '/apply') {
+    return <AmbassadorApply />;
+  }
+
   const [booted, setBooted] = useState(false);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
