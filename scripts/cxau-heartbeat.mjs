@@ -18,11 +18,13 @@ import {
   ClawnchSwapper,
   NATIVE_TOKEN_ADDRESS,
 } from '@clawnch/clawncher-sdk';
+import { Attribution } from 'ox/erc8021';
 
 const DB_PATH = process.env.CLAW_TOMATON_DB_PATH
   || 'C:\\Users\\celik\\clawtomaton-token\\.clawtomaton-state\\clawtomaton.db';
 const RPC_URL = process.env.BASE_RPC_URL || 'https://mainnet.base.org';
 const DEAD_ADDRESS = '0x000000000000000000000000000000000000dEaD';
+const BUILDER_CODE_SUFFIX = Attribution.toDataSuffix({ codes: ['bc_ti47f8yd'] });
 
 const CLAIM_THRESHOLD = parseEther(process.env.CXAU_CLAIM_THRESHOLD_ETH || '0.01');
 const MIN_BUYBACK_ETH = parseEther(process.env.CXAU_MIN_BUYBACK_ETH || '0.01');
@@ -157,7 +159,7 @@ async function main() {
 
   const account = privateKeyToAccount(identity.private_key);
   const publicClient = createPublicClient({ chain: base, transport: http(RPC_URL) });
-  const walletClient = createWalletClient({ account, chain: base, transport: http(RPC_URL) });
+  const walletClient = createWalletClient({ account, chain: base, transport: http(RPC_URL), dataSuffix: BUILDER_CODE_SUFFIX });
   const reader = new ClawnchReader({ publicClient, network: 'mainnet' });
   const claimer = new ClawncherClaimer({ wallet: walletClient, publicClient, network: 'mainnet' });
   const swapper = new ClawnchSwapper({ wallet: walletClient, publicClient, network: 'mainnet' });
