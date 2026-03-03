@@ -1,4 +1,13 @@
 {
+  "headers": [
+    {
+      "source": "/.well-known/(.*)",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/cxau", "destination": "/cxau/index.html" },
     { "source": "/leaderboard", "destination": "/leaderboard/index.html" },
