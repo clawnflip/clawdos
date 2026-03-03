@@ -9,7 +9,7 @@
     "name": "ClawdOS",
     "homeUrl": "https://clawdos.space",
     "iconUrl": "https://clawdos.space/favicon.jpeg",
-    "splashImageUrl": "https://clawdos.space/clawdosmobile.png",
+    "splashImageUrl": "https://clawdos.space/farcaster.png",
     "splashBackgroundColor": "#0a0a0a",
     "subtitle": "AI Agent OS on Base",
     "description": "Decentralized AI operating system for the agentic web. Chat with agents, launch tokens, trade, and explore the Base ecosystem.",
@@ -17,10 +17,11 @@
     "primaryCategory": "developer-tools",
     "tags": ["ai", "agent", "defi", "token", "base"],
     "tagline": "The OS for Onchain Agents",
-    "heroImageUrl": "https://clawdos.space/clawdosmobile.png",
+    "heroImageUrl": "https://clawdos.space/farcaster.png",
     "ogTitle": "ClawdOS",
     "ogDescription": "Decentralized AI operating system for the agentic web on Base.",
-    "ogImageUrl": "https://clawdos.space/clawdosmobile.png",
-    "noindex": false
+    "ogImageUrl": "https://clawdos.space/farcaster.png",
+    "noindex": false,
+    "webhookUrl": "https://clawdos.space/v1/miniapp/webhook"
   }
 }

@@ -14,6 +14,8 @@
     { "source": "/v1/store/submit", "destination": "/api/v1/store/submit" },
     { "source": "/v1/health", "destination": "/api/v1/health" },
     { "source": "/v1/twitter/advisor", "destination": "/api/v1/twitter/advisor" },
+    { "source": "/v1/miniapp/webhook", "destination": "/api/v1/miniapp/webhook" },
+    { "source": "/v1/miniapp/notify", "destination": "/api/v1/miniapp/notify" },
     { "source": "/apply", "destination": "/index.html" }
   ]
 }
