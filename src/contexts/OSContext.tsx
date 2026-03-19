@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -474,7 +474,8 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
         initRef.current = true;
         console.log("OSContext: Initializing...");
         
-        // Fetch Mini Apps
+        // Fetch Mini Apps (temporarily disabled per user request to hide the folder)
+        /*
         import('../utils/supabaseClient').then(({ supabase }) => {
             supabase
                 .from('mini_apps')
@@ -488,7 +489,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                             type: 'file' as const,
                             parentId: 'miniapps_folder',
                             content: app.code,
-                            icon: app.icon || 'ğŸ“±',
+                            icon: app.icon || '📱',
                             appUrl: app.app_url,
                             appType: app.app_type || 'code',
                             imageUrl: app.image_url,
@@ -507,6 +508,7 @@ export const OSProvider = ({ children }: { children: ReactNode }) => {
                     }
                 });
         });
+        */
 
         // Agent Chat auto-open for Arena event (only on desktop)
         if (window.innerWidth > 768) {
